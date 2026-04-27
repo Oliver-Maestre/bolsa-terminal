@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual de Usuario — Bolsa Terminal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 12.5px; line-height: 1.75;
+    color: #1a1a2e; background: #fff;
+    padding: 36px 56px; max-width: 900px; margin: 0 auto;
+  }
+  h1 { font-size: 28px; color: #0f172a; border-bottom: 4px solid #1e40af; padding-bottom: 10px; margin: 32px 0 18px; }
+  h2 { font-size: 20px; color: #1e40af; border-left: 5px solid #3b82f6; padding-left: 14px; margin: 28px 0 12px; background: #eff6ff; border-radius: 0 6px 6px 0; padding-top: 6px; padding-bottom: 6px; }
+  h3 { font-size: 15px; color: #1e3a5f; margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+  h4 { font-size: 13px; color: #334155; margin: 14px 0 6px; font-style: italic; }
+  p { margin: 7px 0; }
+  ul { margin: 8px 0 8px 22px; }
+  li { margin: 4px 0; line-height: 1.6; }
+  pre { background: #f1f5f9; padding: 12px 16px; border-radius: 6px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 11px; overflow-x: auto; white-space: pre-wrap; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 11.5px; }
+  td { border: 1px solid #cbd5e1; padding: 7px 11px; vertical-align: top; }
+  .thead td, tr.thead td { background: #1e40af; color: white; font-weight: 700; }
+  tr:nth-child(even):not(.thead) td { background: #f8fafc; }
+  code { background: #eff6ff; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; }
+  blockquote { border-left: 4px solid #3b82f6; background: #eff6ff; padding: 10px 16px; margin: 14px 0; border-radius: 0 6px 6px 0; font-style: italic; color: #334155; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 28px 0; }
+  strong { color: #1e3a5f; }
+  em { color: #64748b; }
+  @media print {
+    body { padding: 16px 24px; }
+    h2 { break-before: auto; }
+    h1 { break-before: page; }
+    h1:first-of-type { break-before: auto; }
+    table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Manual de Usuario — Bolsa Terminal</h1>
+
+<blockquote>Guía completa de todas las funcionalidades del dashboard: cómo navegar, interpretar datos y ejecutar cada tarea disponible.</blockquote>
+
+<hr>
+
+<h2>Índice</h2>
+
+<li class="ol">Estructura general de la aplicación</li>
+<li class="ol">Dashboard principal — Mercados</li>
+<li class="ol">Screener de Mercados</li>
+<li class="ol">Gráfico de activo</li>
+<li class="ol">Comparador de Activos</li>
+<li class="ol">Portfolio personal</li>
+<li class="ol">Broker Paper Trading</li>
+<li class="ol">Bot de Trading Automático</li>
+<li class="ol">Agente de Inversión IA</li>
+<li class="ol">Simulador de Inversiones</li>
+<li class="ol">Watchlist y navegación lateral</li>
+<li class="ol">Guía del Inversor (asistente flotante)</li>
+<li class="ol">Fuentes de datos y fiabilidad</li>
+<li class="ol">Glosario rápido</li>
+
+<hr>
+
+<h2>1. Estructura general de la aplicación</h2>
+
+<p>La aplicación se divide en tres zonas visuales:</p>
+
+<pre>┌──────────────────────────────────────────────────────┐
+<p>│  BARRA SUPERIOR (TopBar)  —  búsqueda + estado       │</p>
+<p>├──────────────┬───────────────────────────────────────┤</p>
+<p>│              │                                       │</p>
+<p>│  SIDEBAR     │   ÁREA PRINCIPAL (contenido)          │</p>
+<p>│  Navegación  │                                       │</p>
+<p>│  Watchlist   │                                       │</p>
+<p>│  Estado mdo. │                                       │</p>
+<p>│              │                                       │</p>
+<p>└──────────────┴───────────────────────────────────────┘</p>
+<p>                          [Guía ⊕]  ← botón flotante</p>
+</pre>
+
+<h3>Barra superior (TopBar)</h3>
+<ul><li><strong>Buscador</strong>: escribe cualquier símbolo (AAPL, BTC-USD, SAN.MC…) o nombre de empresa. Pulsa Enter o haz clic en el resultado para abrir su gráfico.</li>
+<li>El buscador busca en tiempo real mientras escribes.</li>
+
+</ul><h3>Sidebar izquierda</h3>
+<ul><li><strong>Navegación principal</strong>: acceso a todas las secciones.</li>
+<li><strong>Watchlist</strong>: lista de activos favoritos con precio y variación en tiempo real. Actualiza cada 15 segundos.</li>
+<li><strong>Estado del mercado</strong>: indicador verde/rojo de si NYSE/NASDAQ, Bolsa de Madrid y Crypto están abiertos ahora mismo.</li>
+
+</ul><h3>Botón "Guía" (esquina inferior derecha)</h3>
+<ul><li>Panel deslizante con consejos contextuales según la página en la que estés.</li>
+<li>Guías paso a paso para comprar, vender, usar el screener, gestión del riesgo y fiscalidad.</li>
+
+</ul><hr>
+
+<h2>2. Dashboard principal — Mercados</h2>
+
+<strong>Ruta</strong>: <code>/</code> (pantalla de inicio)
+
+<p>El dashboard tiene 4 secciones accesibles mediante pestañas en la parte superior:</p>
+
+<h3>2.1 Pestaña "Mercados"</h3>
+
+<h4>Índices Globales</h4>
+<p>Muestra los principales índices mundiales en tiempo real:</p>
+
+<table><tr class="thead"><td>Índice</td><td>Qué representa</td></tr>
+<tr><td>--------</td><td>----------------</td></tr>
+<tr><td>S&P 500</td><td>Las 500 mayores empresas de EE.UU.</td></tr>
+<tr><td>NASDAQ</td><td>Tecnología americana</td></tr>
+<tr><td>Dow Jones</td><td>Las 30 empresas más importantes de EE.UU.</td></tr>
+<tr><td>IBEX 35</td><td>Las 35 mayores empresas españolas</td></tr>
+<tr><td>FTSE 100</td><td>Las 100 mayores empresas del Reino Unido</td></tr>
+<tr><td>Bitcoin</td><td>Precio del bitcoin en USD</td></tr>
+
+</table><strong>Cómo leerlos</strong>: el número grande es el precio actual. El % en verde/rojo es la variación respecto al cierre anterior del día.
+
+<h4>Filtros por bolsa</h4>
+<p>Debajo de los índices hay pestañas para filtrar la tabla de activos:</p>
+
+<ul><li><strong>Todo</strong>: todos los activos monitorizados juntos.</li>
+<li><strong>NYSE / NASDAQ</strong>: acciones americanas.</li>
+<li><strong>Madrid (BME)</strong>: acciones españolas (sufijo .MC).</li>
+<li><strong>Londres (LSE)</strong>: acciones británicas (sufijo .L).</li>
+<li><strong>Crypto</strong>: criptomonedas (BTC-USD, ETH-USD…).</li>
+
+</ul><h4>Tabla de mercado</h4>
+<p>Columnas disponibles:</p>
+
+<table><tr><td>Columna</td><td>Significado</td></tr>
+<tr><td>---------</td><td>-------------</td></tr>
+<tr><td><strong>Símbolo</strong></td><td>Identificador del activo. Haz clic para abrir su gráfico.</td></tr>
+<tr><td><strong>Nombre</strong></td><td>Nombre de la empresa o activo.</td></tr>
+<tr><td><strong>Precio</strong></td><td>Último precio negociado.</td></tr>
+<tr><td><strong>Cambio %</strong></td><td>Variación porcentual del día (verde = sube, rojo = baja).</td></tr>
+<tr><td><strong>Volumen</strong></td><td>Nº de acciones/unidades negociadas hoy.</td></tr>
+<tr><td><strong>RSI</strong></td><td>Índice de fuerza relativa (0-100). Ver sección indicadores.</td></tr>
+<tr><td><strong>MACD</strong></td><td>Histograma MACD. Positivo = impulso alcista.</td></tr>
+<tr><td><strong>Score</strong></td><td>Puntuación algorítmica 0-10. >6 = señal positiva.</td></tr>
+<tr><td><strong>Señal</strong></td><td>BUY / SELL / NEUTRAL según los indicadores técnicos.</td></tr>
+<tr><td><strong>★</strong></td><td>Añade/quita el activo de tu Watchlist.</td></tr>
+
+</table><strong>Ordenar</strong>: haz clic en cualquier cabecera de columna para ordenar ascendente/descendente.
+
+<strong>Abrir gráfico</strong>: haz clic en el símbolo o en el nombre del activo.
+
+<hr>
+
+<h3>2.2 Pestaña "Mis Productos"</h3>
+
+<p>Muestra un resumen de todas tus posiciones abiertas:</p>
+<ul><li><strong>Posiciones del Portfolio</strong> (activos añadidos manualmente).</li>
+<li><strong>Posiciones del Broker</strong> (operaciones de paper trading activas).</li>
+
+</ul><p>Cada tarjeta muestra: símbolo, nombre, precio actual, P&L (ganancia/pérdida), cantidad, y niveles de Stop Loss y Take Profit si los tienes configurados.</p>
+
+<ul><li>Botón <strong>Ver Portfolio</strong> → va a la página de Portfolio completa.</li>
+<li>Botón <strong>Ir al Broker</strong> → va a la página de Broker.</li>
+
+</ul><hr>
+
+<h3>2.3 Pestaña "IA Recomendaciones"</h3>
+
+<p>Muestra las recomendaciones algorítmicas actualizadas de la IA para los tres horizontes temporales:</p>
+
+<ul><li><strong>Corto plazo</strong> (1-15 días): activos con señales de momentum inmediato.</li>
+<li><strong>Medio plazo</strong> (1-3 meses): activos con tendencia sostenida.</li>
+<li><strong>Largo plazo</strong> (6-24 meses): activos con fundamentos y tendencia estructural.</li>
+
+</ul><p>Cada tarjeta de recomendación incluye:</p>
+<ul><li>Zona de entrada (precio de compra sugerido).</li>
+<li>Stop Loss recomendado.</li>
+<li>Take Profit objetivo.</li>
+<li>Ratio Riesgo:Recompensa.</li>
+<li>RSI actual y puntuación de confianza (barra de progreso).</li>
+
+</ul><p>Botón <strong>Chat con IA</strong> → abre la página de Agente IA para consultar directamente.</p>
+
+<hr>
+
+<h3>2.4 Pestaña "Guía de Inversión"</h3>
+
+<p>Tutorial interactivo de 6 pasos para inversores principiantes:</p>
+<li class="ol">Entender el mercado.</li>
+<li class="ol">Elegir dónde invertir.</li>
+<li class="ol">Analizar con el Screener.</li>
+<li class="ol">Leer el gráfico.</li>
+<li class="ol">Ejecutar tu primera operación.</li>
+<li class="ol">Gestionar el riesgo.</li>
+
+<p>Cada paso se puede expandir, marcar como completado, y tiene accesos directos a las herramientas relevantes.</p>
+
+<hr>
+
+<h2>3. Screener de Mercados</h2>
+
+<strong>Ruta</strong>: <code>/screener</code>
+
+<p>El Screener analiza todos los activos monitorizados y permite filtrarlos por señales técnicas.</p>
+
+<h3>Cómo usar el Screener</h3>
+
+<strong>Paso 1 — Selecciona la bolsa</strong>
+<p>Usa las pestañas superiores: Todos / NYSE / NASDAQ / BME / LSE / Crypto.</p>
+
+<strong>Paso 2 — Aplica filtros</strong>
+<ul><li><strong>Señal</strong>: BUY (señal alcista), SELL (bajista), NEUTRAL (sin señal clara).</li>
+<li><strong>RSI mínimo/máximo</strong>: filtra por rango de RSI (ej: 0-40 para sobrevendidos).</li>
+<li><strong>Sector</strong>: Tecnología, Finanzas, Energía, Salud, etc.</li>
+
+</ul><strong>Paso 3 — Ordena los resultados</strong>
+<p>Haz clic en las cabeceras para ordenar por Score (mayor primero es lo más habitual).</p>
+
+<strong>Paso 4 — Abre el activo que te interese</strong>
+<p>Haz clic en el símbolo para ver el gráfico completo con indicadores y recomendación.</p>
+
+<h3>Estrategia de uso recomendada</h3>
+<li class="ol">Filtra por <strong>Señal = BUY</strong> + <strong>RSI < 40</strong> → activos sobrevendidos con señal alcista.</li>
+<li class="ol">Ordena por <strong>Score</strong> descendente.</li>
+<li class="ol">Abre el gráfico de los 3 primeros candidatos.</li>
+<li class="ol">Confirma la tendencia visual antes de operar.</li>
+
+<hr>
+
+<h2>4. Gráfico de Activo</h2>
+
+<strong>Ruta</strong>: <code>/chart/:SIMBOLO</code> (accesible desde cualquier tabla o buscador)
+
+<h3>Elementos del gráfico</h3>
+
+<h4>Panel izquierdo — Gráfico de velas</h4>
+<p>El gráfico de velas (candlestick) muestra:</p>
+
+<ul><li><strong>Vela verde</strong>: el precio cerró por encima de la apertura (día alcista).</li>
+<li><strong>Vela roja</strong>: el precio cerró por debajo de la apertura (día bajista).</li>
+<li><strong>Mecha superior</strong>: precio máximo del período.</li>
+<li><strong>Mecha inferior</strong>: precio mínimo del período.</li>
+<li><strong>Cuerpo</strong>: rango entre apertura y cierre.</li>
+
+</ul><h4>Indicadores superpuestos (activables/desactivables)</h4>
+
+<table><tr><td>Indicador</td><td>Qué muestra</td><td>Cómo leerlo</td></tr>
+<tr><td>-----------</td><td>-------------</td><td>-------------</td></tr>
+<tr><td><strong>MA (Media Móvil)</strong></td><td>Línea suavizada de la tendencia</td><td>Precio sobre la MA = tendencia alcista. Precio bajo la MA = bajista.</td></tr>
+<tr><td><strong>Bollinger Bands</strong></td><td>Banda superior e inferior en torno a la MA</td><td>Precio en banda inferior = posible soporte. Precio en banda superior = posible resistencia.</td></tr>
+<tr><td><strong>RSI</strong></td><td>Panel separado debajo, rango 0-100</td><td><30 sobrevendido (posible compra). >70 sobrecomprado (posible venta).</td></tr>
+<tr><td><strong>MACD</strong></td><td>Histograma de barras + líneas</td><td>Barras verdes = impulso alcista. Barras rojas = impulso bajista.</td></tr>
+
+</table><h4>Controles de período e intervalo</h4>
+
+<table><tr><td>Período</td><td>Útil para</td></tr>
+<tr><td>---------</td><td>-----------</td></tr>
+<tr><td>1d / 5d</td><td>Análisis intradiario</td></tr>
+<tr><td>1mo / 3mo</td><td>Corto plazo</td></tr>
+<tr><td>6mo / 1y</td><td>Medio plazo</td></tr>
+<tr><td>2y / 5y / 10y</td><td>Largo plazo, análisis de ciclos</td></tr>
+
+<tr><td>Intervalo</td><td>Descripción</td></tr>
+<tr><td>-----------</td><td>-------------</td></tr>
+<tr><td>1d</td><td>Una vela = un día</td></tr>
+<tr><td>1wk</td><td>Una vela = una semana</td></tr>
+<tr><td>1mo</td><td>Una vela = un mes</td></tr>
+
+</table><h4>Panel derecho — Datos del activo</h4>
+
+<strong>Cabecera de cotización</strong> (QuoteHeader):
+<ul><li>Precio actual, variación del día.</li>
+<li>Precio de apertura, máximo y mínimo del día.</li>
+<li>Volumen del día.</li>
+<li>Capitalización de mercado.</li>
+<li>Máximos y mínimos de 52 semanas.</li>
+<li>Botón <strong>+ Portfolio</strong>: añade este activo a tu portfolio personal.</li>
+
+</ul><strong>Tarjeta de recomendación</strong> (RecommendationCard):
+<ul><li>Señal: BUY / SELL / NEUTRAL.</li>
+<li>Score técnico 0-10.</li>
+<li>RSI, MACD, Bollinger % actuales.</li>
+<li>Rango de precio sugerido para entrada.</li>
+<li>Stop Loss y Take Profit calculados automáticamente.</li>
+<li>Ratio Riesgo:Recompensa.</li>
+
+</ul><h3>Tareas disponibles desde el gráfico</h3>
+<ul><li><strong>Añadir a Watchlist</strong>: botón estrella ★ en la cabecera.</li>
+<li><strong>Añadir al Portfolio</strong>: botón "+ Portfolio" en la cabecera.</li>
+<li><strong>Zoom</strong>: rueda del ratón sobre el gráfico.</li>
+<li><strong>Desplazar</strong>: clic y arrastrar horizontalmente.</li>
+
+</ul><hr>
+
+<h2>5. Comparador de Activos</h2>
+
+<strong>Ruta</strong>: <code>/comparison</code>
+
+<p>Permite comparar la evolución porcentual de hasta 5 activos en el mismo gráfico, normalizados desde el 0% en un punto de partida común.</p>
+
+<h3>Cómo usar el Comparador</h3>
+
+<li class="ol">Los activos por defecto son AAPL, MSFT, NVDA.</li>
+<li class="ol"><strong>Añadir activo</strong>: escribe el símbolo en el campo de búsqueda y pulsa Añadir.</li>
+<li class="ol"><strong>Eliminar activo</strong>: haz clic en la × junto al símbolo.</li>
+<li class="ol"><strong>Seleccionar período</strong>: cambia el rango temporal para ver la comparativa histórica.</li>
+<li class="ol"><strong>Pasar el ratón</strong> sobre el gráfico para ver los valores exactos de cada activo en esa fecha.</li>
+
+<h3>Interpretación</h3>
+<ul><li>La línea que queda más arriba al final del período tiene mejor rentabilidad acumulada.</li>
+<li>Una línea que empieza a divergir al alza respecto al resto indica fuerza relativa (outperformance).</li>
+<li>Una línea que cae mientras las demás suben indica debilidad relativa.</li>
+
+</ul><hr>
+
+<h2>6. Portfolio Personal</h2>
+
+<strong>Ruta</strong>: <code>/portfolio</code>
+
+<p>El portfolio guarda tus posiciones manualmente y calcula métricas en tiempo real.</p>
+
+<blockquote><strong>Nota</strong>: los datos del portfolio se guardan en el navegador (localStorage). Son persistentes entre sesiones pero no se sincronizan con un servidor.</blockquote>
+
+<h3>Añadir una posición</h3>
+
+<li class="ol">Haz clic en el botón <strong>+ Añadir posición</strong> (esquina superior derecha).</li>
+<li class="ol">Rellena el formulario:</li>
+<p>   - <strong>Símbolo</strong>: ej. AAPL, BTC-USD, SAN.MC.</p>
+<p>   - <strong>Cantidad</strong>: número de acciones o unidades.</p>
+<p>   - <strong>Precio de coste</strong>: precio al que compraste (por unidad).</p>
+<p>   - <strong>Fecha de compra</strong>: fecha de la operación.</p>
+<p>   - <strong>Notas</strong>: campo libre (opcional).</p>
+<li class="ol">Haz clic en <strong>Guardar</strong>.</li>
+
+<p>También puedes añadir desde el gráfico de cualquier activo con el botón <strong>+ Portfolio</strong>.</p>
+
+<h3>Vista del portfolio</h3>
+
+<strong>Tarjetas de resumen</strong> (parte superior):
+<ul><li><strong>Valor total</strong>: suma del valor actual de todas las posiciones.</li>
+<li><strong>Coste total</strong>: suma de lo que pagaste.</li>
+<li><strong>P&L total</strong>: ganancia o pérdida total en dinero.</li>
+<li><strong>Rentabilidad %</strong>: retorno porcentual global.</li>
+<li><strong>Mejor posición</strong>: la que más ha subido.</li>
+<li><strong>Peor posición</strong>: la que más ha bajado.</li>
+
+</ul><strong>Gráfico circular</strong>: distribución del capital por activo.
+
+<strong>Tabla de posiciones</strong>: todas tus posiciones con precio actual, P&L individual y variación del día. Actualiza automáticamente cada 15 segundos.
+
+<h3>Editar o eliminar una posición</h3>
+
+<ul><li><strong>Editar</strong>: haz clic en el icono de lápiz ✏️ de la fila.</li>
+<li><strong>Eliminar</strong>: haz clic en el icono de papelera 🗑️ de la fila.</li>
+
+</ul><hr>
+
+<h2>7. Broker Paper Trading</h2>
+
+<strong>Ruta</strong>: <code>/broker</code>
+
+<p>El broker simula operaciones reales con <strong>capital virtual de $100.000</strong>. No se mueve dinero real.</p>
+
+<h3>Cambiar moneda (USD / EUR)</h3>
+
+<p>En la esquina superior derecha hay un selector <strong>$ USD / € EUR</strong>. Al cambiar:</p>
+<ul><li>Todos los precios, P&L, totales y comisiones se convierten a la moneda seleccionada.</li>
+<li>El tipo de cambio EUR/USD se actualiza en tiempo real (EURUSD=X).</li>
+<li>Se muestra la equivalencia en la otra moneda como referencia secundaria.</li>
+
+</ul><h3>Panel de métricas de cuenta</h3>
+
+<table><tr><td>Métrica</td><td>Significado</td></tr>
+<tr><td>---------</td><td>-------------</td></tr>
+<tr><td><strong>Capital Total</strong></td><td>Efectivo + valor actual de todas las posiciones.</td></tr>
+<tr><td><strong>Efectivo</strong></td><td>Dinero disponible para nuevas compras.</td></tr>
+<tr><td><strong>P&L Total</strong></td><td>Ganancia o pérdida acumulada desde el inicio.</td></tr>
+<tr><td><strong>Posiciones</strong></td><td>Número de posiciones abiertas actualmente.</td></tr>
+<tr><td><strong>Win Rate</strong></td><td>% de operaciones cerradas con ganancia.</td></tr>
+
+</table><h3>Ejecutar una orden de COMPRA</h3>
+
+<li class="ol">En el panel de la derecha <strong>"Nueva Orden"</strong>, selecciona <strong>COMPRAR</strong>.</li>
+<li class="ol">Escribe el <strong>símbolo</strong> del activo (ej: AAPL).</li>
+<li class="ol">El precio de mercado actual aparece automáticamente.</li>
+<li class="ol">Elige el <strong>modo de cantidad</strong>:</li>
+<p>   - <strong>Nº acciones</strong>: introduce cuántas acciones quieres comprar.</p>
+<p>   - <strong>Importe €/$</strong>: introduce el dinero que quieres invertir. El sistema calcula automáticamente las acciones.</p>
+<li class="ol">(Opcional) Introduce <strong>Stop Loss</strong>: precio al que la posición se cerrará automáticamente si baja.</li>
+<li class="ol">(Opcional) Introduce <strong>Take Profit</strong>: precio objetivo de ganancia.</li>
+<li class="ol">El resumen "Estimado" muestra el coste total + comisión (0,1%).</li>
+<li class="ol">Haz clic en <strong>Comprar [SÍMBOLO]</strong>.</li>
+
+<h3>Ejecutar una orden de VENTA</h3>
+
+<li class="ol">Selecciona <strong>VENDER</strong> en el panel.</li>
+<li class="ol">Escribe el símbolo.</li>
+<li class="ol">Introduce la cantidad o importe.</li>
+<li class="ol">Haz clic en <strong>Vender [SÍMBOLO]</strong>.</li>
+
+<p>O desde la tabla de posiciones abiertas, haz clic en el botón <strong>Vender</strong> de la fila del activo (cierra toda la posición de ese activo).</p>
+
+<h3>Pestaña "Posiciones abiertas"</h3>
+
+<p>Tabla con todas las posiciones activas:</p>
+<ul><li>Precio de coste medio, precio actual, valor, P&L absoluto y porcentual.</li>
+<li>Stop Loss y Take Profit configurados.</li>
+<li>Fuente de datos (Yahoo, Stooq, etc.).</li>
+<li>Botón <strong>Vender</strong> para cerrar la posición completa.</li>
+<li><strong>Clic en el símbolo</strong> para abrir el gráfico.</li>
+
+</ul><h3>Pestaña "Historial de operaciones"</h3>
+
+<p>Registro de todas las compras y ventas ejecutadas:</p>
+<ul><li>Fecha, símbolo, lado (BUY/SELL), cantidad, precio, total y comisión.</li>
+
+</ul><h3>Reiniciar la cuenta</h3>
+
+<p>Botón <strong>Reiniciar cuenta</strong> (esquina inferior derecha del resumen). Devuelve el capital a $100.000 y borra todo el historial. <strong>Esta acción es irreversible</strong>.</p>
+
+<hr>
+
+<h2>8. Bot de Trading Automático</h2>
+
+<strong>Ruta</strong>: <code>/bot</code>
+
+<p>El bot escanea el mercado automáticamente y ejecuta órdenes de compra/venta en la cuenta de paper trading sin intervención manual.</p>
+
+<blockquote><strong>Importante</strong>: el bot opera siempre con capital virtual. No ejecuta órdenes reales.</blockquote>
+
+<h3>Modos de operación</h3>
+
+<table><tr><td>Modo</td><td>RSI máx. compra</td><td>Score mín.</td><td>Stop Loss</td><td>Take Profit</td><td>Máx. posiciones</td></tr>
+<tr><td>------</td><td>-----------------</td><td>-----------</td><td>-----------</td><td>-------------</td><td>-----------------</td></tr>
+<tr><td><strong>Conservador</strong></td><td>35</td><td>5/10</td><td>5%</td><td>12%</td><td>3</td></tr>
+<tr><td><strong>Moderado</strong></td><td>42</td><td>4/10</td><td>7%</td><td>18%</td><td>5</td></tr>
+<tr><td><strong>Agresivo</strong></td><td>50</td><td>3/10</td><td>10%</td><td>25%</td><td>8</td></tr>
+
+</table><h3>Configurar y activar el bot</h3>
+
+<li class="ol">Selecciona el <strong>modo</strong> (Conservador / Moderado / Agresivo).</li>
+<li class="ol">Ajusta el <strong>intervalo de escaneo</strong> (en segundos) — mínimo recomendado: 60s.</li>
+<li class="ol">Ajusta el <strong>tamaño de posición</strong> (% del capital por operación).</li>
+<li class="ol">Haz clic en <strong>Iniciar Bot</strong>.</li>
+
+<h3>Cómo funciona el bot</h3>
+
+<li class="ol"><strong>Escanea</strong> todos los activos del screener según el intervalo configurado.</li>
+<li class="ol"><strong>Filtra</strong> los que cumplen las condiciones del modo (RSI, score, señal).</li>
+<li class="ol"><strong>Compra</strong> los activos que pasan el filtro, asignando Stop Loss y Take Profit automáticos.</li>
+<li class="ol"><strong>Vigila</strong> las posiciones abiertas y las cierra si se activa el SL o el TP.</li>
+
+<h3>Registro de actividad (log)</h3>
+
+<p>Panel con el historial de acciones del bot en tiempo real:</p>
+<ul><li>✅ <strong>BUY</strong>: compra ejecutada — muestra símbolo, precio, RSI y score.</li>
+<li>✅ <strong>SELL</strong>: venta ejecutada — muestra P&L de la operación.</li>
+<li>ℹ️ <strong>HOLD</strong>: activo analizado pero no comprado (no cumple criterios).</li>
+<li>❌ <strong>ERROR</strong>: error en la ejecución.</li>
+
+</ul><h3>Detener el bot</h3>
+
+<p>Haz clic en <strong>Detener Bot</strong>. Las posiciones abiertas permanecen activas hasta que se cierren manualmente o el bot se reinicie.</p>
+
+<hr>
+
+<h2>9. Agente de Inversión IA</h2>
+
+<strong>Ruta</strong>: <code>/ai</code>
+
+<p>El agente IA combina análisis algorítmico con inteligencia artificial conversacional (Claude de Anthropic).</p>
+
+<h3>Estado del agente</h3>
+
+<ul><li><strong>Claude AI activo</strong>: el sistema tiene una clave API de Anthropic configurada. El chat usa IA real.</li>
+<li><strong>Modo algorítmico</strong>: no hay clave API. El chat usa respuestas basadas en el análisis técnico del screener.</li>
+
+</ul><blockquote>Para activar Claude AI: añade <code>ANTHROPIC_API_KEY=tu_clave</code> al archivo <code>/backend/.env</code> y reinicia el servidor.</blockquote>
+
+<h3>Pestaña "Recomendaciones"</h3>
+
+<p>Muestra las recomendaciones del motor algorítmico para tres horizontes:</p>
+
+<strong>Corto plazo (1-15 días)</strong>
+<ul><li>Criterios: RSI < 52, score ≥ 2, BB% < 0.55.</li>
+<li>Stop Loss: 4% bajo el precio de entrada.</li>
+<li>Take Profit: 8% sobre el precio de entrada.</li>
+
+</ul><strong>Medio plazo (1-3 meses)</strong>
+<ul><li>Criterios: RSI < 62, score ≥ 3, BB% < 0.70.</li>
+<li>Stop Loss: 7% bajo la entrada.</li>
+<li>Take Profit: 18%.</li>
+
+</ul><strong>Largo plazo (6-24 meses)</strong>
+<ul><li>Criterios: RSI < 68, score ≥ 4, BB% < 0.80.</li>
+<li>Stop Loss: 12%.</li>
+<li>Take Profit: 35%.</li>
+
+</ul><p>Cada tarjeta muestra:</p>
+<ul><li>Símbolo, exchange, precio actual.</li>
+<li>Barra de confianza (%).</li>
+<li>Zona de entrada (precio mínimo y máximo sugerido).</li>
+<li>Stop Loss y Take Profit calculados.</li>
+<li>Ratio Riesgo:Recompensa.</li>
+<li>Razones técnicas que justifican la señal.</li>
+<li>Señal (COMPRA FUERTE / COMPRA / MANTENER).</li>
+
+</ul><h3>Pestaña "Chat con IA"</h3>
+
+<p>Chat conversacional donde puedes hacer preguntas en lenguaje natural sobre el mercado.</p>
+
+<strong>Prompts rápidos</strong> (botones de acceso directo):
+<ul><li>¿Qué comprar hoy?</li>
+<li>Corto plazo (3 mejores oportunidades con niveles).</li>
+<li>Medio plazo.</li>
+<li>Largo plazo.</li>
+<li>¿Qué evitar? (señales bajistas).</li>
+<li>Mi cartera (análisis y recomendaciones).</li>
+
+</ul><strong>Cómo usar el chat</strong>:
+<li class="ol">Escribe tu pregunta en el campo de texto o usa un prompt rápido.</li>
+<li class="ol">Pulsa Enter o el botón de enviar.</li>
+<li class="ol">La IA responde con análisis basado en los datos reales del screener.</li>
+<li class="ol">Puedes preguntar por activos concretos, estrategias, o pedir explicaciones de los indicadores.</li>
+
+<strong>Ejemplos de preguntas útiles</strong>:
+<ul><li><em>"¿Cuál es el activo con mejor señal técnica ahora mismo?"</em></li>
+<li><em>"Analiza AAPL — ¿está en buen momento para comprar?"</em></li>
+<li><em>"¿Qué dice el RSI de BTC-USD?"</em></li>
+<li><em>"Dame un plan de inversión con 1.000€ para los próximos 3 meses"</em></li>
+
+</ul><hr>
+
+<h2>10. Simulador de Inversiones</h2>
+
+<strong>Ruta</strong>: <code>/simulator</code>
+
+<h3>10.1 Backtesting — ¿Qué habría pasado?</h3>
+
+<p>Simula una operación pasada con datos de mercado reales para evaluar si habría sido rentable.</p>
+
+<strong>Cómo usarlo</strong>:
+
+<li class="ol">Introduce el <strong>símbolo</strong> del activo (ej: AAPL, MSFT, BTC-USD).</li>
+<li class="ol">Selecciona la <strong>moneda</strong> (USD o EUR).</li>
+<li class="ol">Introduce la <strong>fecha de compra</strong> (la fecha en que habrías comprado).</li>
+<li class="ol">Introduce la <strong>fecha de venta</strong> (o déjalo vacío para usar hoy).</li>
+<li class="ol">Elige el <strong>modo de cantidad</strong>:</li>
+<p>   - <em>Nº acciones</em>: cuántas acciones habrías comprado.</p>
+<p>   - <em>Importe</em>: cuánto dinero habrías invertido en la moneda seleccionada.</p>
+<li class="ol">Haz clic en <strong>Simular operación</strong>.</li>
+
+<strong>Resultados que muestra</strong>:
+
+<table><tr><td>Resultado</td><td>Explicación</td></tr>
+<tr><td>-----------</td><td>-------------</td></tr>
+<tr><td><strong>Calificación</strong></td><td>Excelente / Buena / Neutra / Pobre / Mala según el retorno</td></tr>
+<tr><td><strong>P&L</strong></td><td>Ganancia o pérdida total</td></tr>
+<tr><td><strong>Rentabilidad %</strong></td><td>Retorno porcentual bruto</td></tr>
+<tr><td><strong>Rentab. anualizada</strong></td><td>Retorno ajustado a un año (para comparar períodos distintos)</td></tr>
+<tr><td><strong>Días en cartera</strong></td><td>Duración del holding</td></tr>
+<tr><td><strong>Alpha vs S&P 500</strong></td><td>Cuánto mejor/peor que el índice de referencia americano</td></tr>
+<tr><td><strong>vs IBEX 35</strong></td><td>Comparativa con el índice español</td></tr>
+
+</table><strong>Gráfico de rentabilidad</strong>: evolución porcentual de tu activo vs S&P 500 vs IBEX 35 durante el período.
+
+<hr>
+
+<h3>10.2 Proyecciones — Monte Carlo</h3>
+
+<p>Proyecta el valor futuro de una inversión usando 2.000 simulaciones estadísticas basadas en el historial real de volatilidad del activo.</p>
+
+<strong>Cómo usarlo</strong>:
+
+<li class="ol">Introduce el <strong>símbolo</strong> del activo.</li>
+<li class="ol">Selecciona la <strong>moneda</strong>.</li>
+<li class="ol">Introduce el <strong>importe a invertir</strong>.</li>
+<li class="ol">Haz clic en <strong>Proyectar (Monte Carlo)</strong>.</li>
+
+<strong>Resultados</strong>:
+
+<ul><li><strong>Retorno histórico anual</strong>: media del retorno anual de los últimos 2 años.</li>
+<li><strong>Volatilidad anual</strong>: desviación estándar anualizada de los retornos.</li>
+
+</ul><strong>Tabla de proyecciones</strong> para 7 horizontes (1 semana → 5 años):
+
+<table><tr><td>Columna</td><td>Significado</td></tr>
+<tr><td>---------</td><td>-------------</td></tr>
+<tr><td><strong>Pesimista (P25)</strong></td><td>El 25% de las simulaciones terminó por debajo de este valor</td></tr>
+<tr><td><strong>Esperado (P50)</strong></td><td>La mediana — el 50% de las simulaciones está por encima y el 50% por debajo</td></tr>
+<tr><td><strong>Optimista (P75)</strong></td><td>El 75% de las simulaciones terminó por debajo de este valor</td></tr>
+<tr><td><strong>Prob. ganar</strong></td><td>% de simulaciones que terminaron en positivo</td></tr>
+
+</table><strong>Gráfico de cono</strong>: visualización del abanico de posibilidades a lo largo del tiempo.
+
+<blockquote>⚠️ Las proyecciones son estimaciones estadísticas basadas en comportamiento histórico. No garantizan rendimientos futuros.</blockquote>
+
+<hr>
+
+<h3>10.3 Calculadora Fiscal IRPF 2024</h3>
+
+<p>Calcula el impacto fiscal de tus operaciones según la legislación española vigente.</p>
+
+<h4>Paso 1 — Introduce tus compras</h4>
+
+<p>Para cada compra realizada:</p>
+<li class="ol">Símbolo del activo.</li>
+<li class="ol">Fecha de compra.</li>
+<li class="ol">Precio por acción en el momento de la compra.</li>
+<li class="ol">Cantidad de acciones compradas.</li>
+<li class="ol">Moneda (EUR o USD). Si es USD, introduce el tipo de cambio EUR/USD en esa fecha.</li>
+<li class="ol">Haz clic en <strong>Añadir compra</strong>.</li>
+
+<p>Repite para cada lote de compra (incluso del mismo activo si compraste en fechas distintas).</p>
+
+<h4>Paso 2 — Introduce tus ventas</h4>
+
+<p>Para cada venta del ejercicio fiscal:</p>
+<li class="ol">Símbolo del activo vendido.</li>
+<li class="ol">Fecha de venta.</li>
+<li class="ol">Precio de venta por acción.</li>
+<li class="ol">Cantidad vendida.</li>
+<li class="ol">Moneda y tipo de cambio si es USD.</li>
+<li class="ol">Haz clic en <strong>Añadir venta</strong>.</li>
+
+<h4>Paso 3 — Resultado fiscal</h4>
+
+<p>La calculadora aplica automáticamente:</p>
+
+<strong>Método FIFO (obligatorio por ley)</strong>
+<p>Las acciones vendidas se descuentan del lote más antiguo primero. Si compraste 10 acciones en enero y 10 en junio, al vender 10 en diciembre se considera que has vendido las de enero.</p>
+
+<strong>Tramos IRPF 2024 — Base del ahorro</strong>:
+
+<table><tr><td>Tramo</td><td>Tipo</td></tr>
+<tr><td>-------</td><td>------</td></tr>
+<tr><td>Hasta 6.000 €</td><td>19%</td></tr>
+<tr><td>De 6.000 € a 50.000 €</td><td>21%</td></tr>
+<tr><td>De 50.000 € a 200.000 €</td><td>23%</td></tr>
+<tr><td>De 200.000 € a 300.000 €</td><td>27%</td></tr>
+<tr><td>Más de 300.000 €</td><td>28%</td></tr>
+
+</table><strong>Compensación de pérdidas</strong>:
+<ul><li>Las pérdidas del ejercicio reducen las ganancias antes de calcular el impuesto.</li>
+<li>Puedes introducir pérdidas de ejercicios anteriores (hasta 4 años) en el campo "Pérdidas pendientes de ejercicios anteriores".</li>
+
+</ul><strong>Regla de los 2 meses (Art. 33.5 LIRPF)</strong>:
+<p>Si vendes con pérdidas y recompras el mismo activo en los 2 meses siguientes (o los 2 meses anteriores), la pérdida queda diferida. La calculadora muestra una advertencia cuando detecta esta situación.</p>
+
+<strong>Modelo 720</strong>:
+<p>Si tienes más de 50.000 € en activos financieros en el extranjero, tienes obligación de declararlo.</p>
+
+<hr>
+
+<h2>11. Watchlist y navegación lateral</h2>
+
+<h3>Añadir un activo a la Watchlist</h3>
+
+<p>Desde cualquier tabla de activos (Dashboard, Screener), haz clic en la estrella <strong>★</strong> del activo.</p>
+
+<p>Desde el gráfico, haz clic en el botón de estrella en la cabecera.</p>
+
+<h3>Ver un activo de la Watchlist</h3>
+
+<p>Haz clic en el símbolo o en la fila del activo en el panel lateral. Se abre el gráfico.</p>
+
+<h3>Eliminar de la Watchlist</h3>
+
+<p>Haz clic en la <strong>×</strong> junto al símbolo en el panel lateral.</p>
+
+<h3>Precios en la Watchlist</h3>
+
+<p>Los precios se actualizan automáticamente cada <strong>15 segundos</strong>. Se muestran el precio actual y la variación porcentual del día.</p>
+
+<h3>Estado de los mercados</h3>
+
+<p>En la parte inferior del sidebar se muestra si cada mercado está abierto ahora mismo:</p>
+
+<ul><li><strong>NYSE / NASDAQ</strong>: 09:30 – 16:00 hora de Nueva York.</li>
+<li><strong>Bolsa de Madrid</strong>: 09:00 – 17:30 hora de Madrid.</li>
+<li><strong>Crypto 24/7</strong>: siempre abierto.</li>
+
+</ul><hr>
+
+<h2>12. Guía del Inversor (asistente flotante)</h2>
+
+<p>El botón azul <strong>"Guía"</strong> en la esquina inferior derecha abre un panel lateral con ayuda contextual.</p>
+
+<h3>Consejos de página</h3>
+<p>Al abrir la guía, muestra 2-3 consejos específicos para la página en la que estás en ese momento.</p>
+
+<h3>¿Qué quieres hacer?</h3>
+<p>Acceso directo a las guías más comunes:</p>
+<ul><li><strong>Comprar un activo</strong> (5 pasos con navegación integrada).</li>
+<li><strong>Vender / cerrar posición</strong> (4 pasos).</li>
+<li><strong>Buscar activos para invertir</strong>.</li>
+<li><strong>Gestionar mi riesgo</strong>.</li>
+
+</ul><h3>Guías completas</h3>
+<p>7 guías expandibles con pasos detallados:</p>
+<li class="ol">Entender el Dashboard.</li>
+<li class="ol">Leer los Indicadores Técnicos (RSI, MACD, Bollinger, Score).</li>
+<li class="ol">Cómo Comprar un Activo (5 pasos).</li>
+<li class="ol">Cuándo y Cómo Vender.</li>
+<li class="ol">Usar el Screener.</li>
+<li class="ol">Gestión del Riesgo.</li>
+<li class="ol">Usar el Simulador.</li>
+
+<h3>Navegación rápida</h3>
+<p>Botones para ir directamente a cualquier sección sin cerrar la guía.</p>
+
+<hr>
+
+<h2>13. Fuentes de datos y fiabilidad</h2>
+
+<p>Los datos de mercado se obtienen de varias fuentes con un sistema de fallback automático:</p>
+
+<table><tr><td>Prioridad</td><td>Fuente</td><td>API Key</td><td>Cobertura</td></tr>
+<tr><td>-----------</td><td>--------</td><td>---------</td><td>-----------</td></tr>
+<tr><td>1</td><td><strong>Yahoo Finance</strong></td><td>No</td><td>Acciones globales, ETFs, crypto, forex</td></tr>
+<tr><td>2</td><td><strong>Stooq</strong></td><td>No</td><td>Acciones US/EU, índices, forex, crypto</td></tr>
+<tr><td>3</td><td><strong>CoinGecko</strong></td><td>No</td><td>Criptomonedas</td></tr>
+<tr><td>4</td><td><strong>FMP</strong></td><td>Sí (opcional)</td><td>Acciones, ETFs, forex</td></tr>
+<tr><td>5</td><td><strong>Alpha Vantage</strong></td><td>Sí (opcional)</td><td>Acciones US</td></tr>
+<tr><td>6</td><td><strong>Datos simulados</strong></td><td>—</td><td>Fallback cuando todo falla</td></tr>
+
+</table><p>Cuando los datos son simulados, el gráfico muestra un banner <strong>"Modo demo"</strong>. Las cotizaciones en tiempo real pueden mostrar la etiqueta de la fuente usada.</p>
+
+<strong>Actualización de datos</strong>:
+<ul><li>Cotizaciones en tiempo real: cada 15 segundos.</li>
+<li>Datos históricos (gráficos): caché de 4 horas.</li>
+<li>Watchlist: cada 15 segundos.</li>
+<li>Estado del bot: cada 3 segundos.</li>
+
+</ul><hr>
+
+<h2>14. Glosario rápido</h2>
+
+<table><tr><td>Término</td><td>Definición</td></tr>
+<tr><td>---------</td><td>-----------</td></tr>
+<tr><td><strong>RSI</strong></td><td>Relative Strength Index. Mide la velocidad y cambio de los movimientos de precio. <30 = sobrevendido. >70 = sobrecomprado.</td></tr>
+<tr><td><strong>MACD</strong></td><td>Moving Average Convergence Divergence. Diferencia entre dos medias móviles exponenciales. Histograma positivo = impulso alcista.</td></tr>
+<tr><td><strong>Bollinger Bands</strong></td><td>Bandas a ±2 desviaciones estándar de la media móvil. BB% = 0 es la banda inferior, BB% = 1 es la banda superior.</td></tr>
+<tr><td><strong>Score</strong></td><td>Puntuación algoritmica 0-10 que combina RSI, MACD y Bollinger. >6 = señal positiva.</td></tr>
+<tr><td><strong>P&L</strong></td><td>Profit & Loss. Ganancia o pérdida de una posición o del portfolio total.</td></tr>
+<tr><td><strong>Stop Loss</strong></td><td>Orden de venta automática que se activa si el precio baja a un nivel definido. Limita las pérdidas.</td></tr>
+<tr><td><strong>Take Profit</strong></td><td>Orden de venta automática que se activa si el precio sube al objetivo. Asegura ganancias.</td></tr>
+<tr><td><strong>Paper Trading</strong></td><td>Simulación de operaciones con dinero virtual. Sin riesgo real.</td></tr>
+<tr><td><strong>Backtesting</strong></td><td>Probar una estrategia de inversión usando datos históricos para ver qué habría pasado.</td></tr>
+<tr><td><strong>FIFO</strong></td><td>First In, First Out. Método de valoración de activos que vende primero las acciones compradas primero. Obligatorio en España.</td></tr>
+<tr><td><strong>Alpha</strong></td><td>Rentabilidad superior (o inferior) respecto a un índice de referencia en el mismo período.</td></tr>
+<tr><td><strong>Volatilidad</strong></td><td>Medida de la variación del precio a lo largo del tiempo. Alta volatilidad = más riesgo y más potencial de ganancia.</td></tr>
+<tr><td><strong>Monte Carlo</strong></td><td>Método estadístico que corre miles de simulaciones aleatorias para estimar la distribución de posibles resultados futuros.</td></tr>
+<tr><td><strong>IRPF</strong></td><td>Impuesto sobre la Renta de las Personas Físicas. En España, las ganancias del capital tributan en la base del ahorro al 19-28%.</td></tr>
+<tr><td><strong>Win Rate</strong></td><td>Porcentaje de operaciones que terminaron con ganancia respecto al total cerrado.</td></tr>
+<tr><td><strong>R:R</strong></td><td>Ratio Riesgo:Recompensa. Compara la ganancia potencial (TP) con la pérdida máxima (SL). R:R 1:3 significa que por cada euro en riesgo puedes ganar 3.</td></tr>
+<tr><td><strong>Spread</strong></td><td>Diferencia entre el precio de compra (ask) y el precio de venta (bid).</td></tr>
+<tr><td><strong>Liquidez / Volumen</strong></td><td>El volumen indica cuántas unidades se han negociado. Alto volumen = alta liquidez = más fácil entrar y salir.</td></tr>
+
+</table><hr>
+
+<em>Manual generado automáticamente — Bolsa Terminal v1.0 — Abril 2026</em>
+<em>Todos los datos y simulaciones son educativos y no constituyen asesoramiento financiero.</em>
+
+</body>
+</html>
