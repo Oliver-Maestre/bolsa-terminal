@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Bolsa Terminal</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_screener">Screener</string>
+    <string name="nav_chart">Gráfico</string>
+    <string name="nav_comparison">Comparativa</string>
+    <string name="nav_portfolio">Cartera</string>
+    <string name="nav_broker">Broker</string>
+    <string name="nav_bot">Bot</string>
+    <string name="nav_ai">IA</string>
+    <string name="nav_simulator">Simulador</string>
+</resources>

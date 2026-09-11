@@ -1,0 +1,5 @@
+<resources>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_markets_section">Mercados</string>
+    <string name="dashboard_top_movers_section">Mayor movimiento</string>
+</resources>

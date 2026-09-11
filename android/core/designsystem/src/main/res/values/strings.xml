@@ -1,0 +1,11 @@
+<resources>
+    <string name="signal_strong_buy">Compra fuerte</string>
+    <string name="signal_buy">Compra</string>
+    <string name="signal_neutral">Neutral</string>
+    <string name="signal_sell">Venta</string>
+    <string name="signal_strong_sell">Venta fuerte</string>
+
+    <string name="action_retry">Reintentar</string>
+    <string name="loading_generic">Cargando…</string>
+    <string name="error_unknown">Error desconocido. Comprueba tu conexión y el token en Ajustes.</string>
+</resources>

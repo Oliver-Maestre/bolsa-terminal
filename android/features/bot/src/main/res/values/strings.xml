@@ -1,0 +1,22 @@
+<resources>
+    <string name="bot_title">Bot</string>
+    <string name="bot_config_title">Configuración</string>
+    <string name="bot_target_symbols_hint">Símbolos objetivo (vacío = todos)</string>
+    <string name="bot_scan_interval_hint">Intervalo de escaneo (s)</string>
+    <string name="bot_apply_config">Aplicar configuración</string>
+    <string name="bot_start">Iniciar bot</string>
+    <string name="bot_stop">Detener bot</string>
+    <string name="bot_scans">Escaneos: %1$d</string>
+    <string name="bot_params_1">Min score: %1$s · Max RSI: %2$s</string>
+    <string name="bot_params_2">SL: %1$s%% · TP: %2$s%%</string>
+    <string name="bot_activity_title">Actividad en vivo</string>
+    <string name="bot_mode_conservative">Conservador</string>
+    <string name="bot_mode_moderate">Moderado</string>
+    <string name="bot_mode_aggressive">Agresivo</string>
+    <string name="bot_action_buy">COMPRA</string>
+    <string name="bot_action_sell">VENTA</string>
+    <string name="bot_action_hold">HOLD</string>
+    <string name="bot_action_scan">SCAN</string>
+    <string name="bot_action_info">INFO</string>
+    <string name="bot_action_error">ERROR</string>
+</resources>

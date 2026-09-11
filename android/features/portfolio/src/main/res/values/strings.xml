@@ -1,0 +1,19 @@
+<resources>
+    <string name="portfolio_title">Cartera</string>
+    <string name="portfolio_empty_title">Sin posiciones todavía</string>
+    <string name="portfolio_empty_subtitle">Añade tus holdings reales para hacer seguimiento</string>
+    <string name="portfolio_add">Añadir posición</string>
+    <string name="portfolio_edit">Editar posición</string>
+    <string name="portfolio_symbol">Símbolo</string>
+    <string name="portfolio_name">Nombre</string>
+    <string name="portfolio_quantity">Cantidad</string>
+    <string name="portfolio_avg_cost">Precio medio de compra</string>
+    <string name="portfolio_save">Guardar</string>
+    <string name="portfolio_cancel">Cancelar</string>
+    <string name="portfolio_delete">Eliminar</string>
+    <string name="portfolio_total_value">Valor total</string>
+    <string name="portfolio_total_cost">Coste total</string>
+    <string name="portfolio_total_pnl">P&amp;L total</string>
+    <string name="portfolio_total_pnl_pct">P&amp;L %</string>
+    <string name="portfolio_distribution">Distribución</string>
+</resources>

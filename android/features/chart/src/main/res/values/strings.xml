@@ -1,0 +1,7 @@
+<resources>
+    <string name="chart_title">Gráfico</string>
+    <string name="chart_symbol_hint">Símbolo (ej. AAPL)</string>
+    <string name="chart_rsi_title">RSI (14)</string>
+    <string name="chart_macd_title">MACD Histograma</string>
+    <string name="chart_bb_title">Bollinger %B</string>
+</resources>

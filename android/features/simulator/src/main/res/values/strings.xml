@@ -1,0 +1,52 @@
+<resources>
+    <string name="simulator_title">Simulador</string>
+    <string name="simulator_tab_backtest">Backtesting</string>
+    <string name="simulator_tab_projection">Proyecciones</string>
+    <string name="simulator_tab_tax">Calculadora Fiscal</string>
+
+    <string name="backtest_invalid_date">Fecha de compra inválida (usa AAAA-MM-DD)</string>
+    <string name="backtest_symbol">Símbolo</string>
+    <string name="backtest_buy_date">Fecha compra</string>
+    <string name="backtest_quantity">Cantidad</string>
+    <string name="backtest_calculate">Calcular</string>
+    <string name="backtest_buy_price">Precio compra</string>
+    <string name="backtest_sell_price">Precio venta</string>
+    <string name="backtest_return">Retorno</string>
+    <string name="backtest_annualized_return">Retorno anualizado</string>
+    <string name="backtest_hold_days">Días en posición</string>
+    <string name="backtest_alpha">Alpha vs S&amp;P500</string>
+    <string name="backtest_rating_excellent">🏆 Excelente operación</string>
+    <string name="backtest_rating_good">✅ Buena operación</string>
+    <string name="backtest_rating_neutral">➖ Operación neutra</string>
+    <string name="backtest_rating_poor">⚠️ Operación pobre</string>
+    <string name="backtest_rating_bad">❌ Mala operación</string>
+
+    <string name="projection_symbol">Símbolo</string>
+    <string name="projection_amount">Importe a invertir</string>
+    <string name="projection_calculate">Proyectar</string>
+    <string name="projection_current_price">Precio actual</string>
+    <string name="projection_shares">Acciones</string>
+    <string name="projection_annual_return">Retorno histórico anual</string>
+    <string name="projection_annual_vol">Volatilidad anual</string>
+    <string name="projection_prob_profit">Prob. beneficio: %1$s%%</string>
+
+    <string name="tax_tab_lots">1. Compras</string>
+    <string name="tax_tab_sales">2. Ventas</string>
+    <string name="tax_tab_result">3. Resultado fiscal</string>
+    <string name="tax_symbol">Símbolo</string>
+    <string name="tax_date">Fecha</string>
+    <string name="tax_quantity">Cantidad</string>
+    <string name="tax_price">Precio</string>
+    <string name="tax_add">Añadir</string>
+    <string name="tax_carry_forward">Pérdidas pendientes de ejercicios anteriores (€)</string>
+    <string name="tax_empty_result">Añade compras y ventas en las pestañas anteriores</string>
+    <string name="tax_wash_sale_warning">Regla 2 meses</string>
+    <string name="tax_gross_gain">Ganancias brutas</string>
+    <string name="tax_gross_loss">Pérdidas del ejercicio</string>
+    <string name="tax_taxable_base">Base imponible del ahorro</string>
+    <string name="tax_total_tax">Cuota a ingresar (IRPF)</string>
+    <string name="tax_effective_rate">Tipo efectivo</string>
+    <string name="tax_net_after_tax">Ganancia neta tras impuestos</string>
+    <string name="tax_carry_forward_pending">Pérdidas pendientes (trasladar 4 años)</string>
+    <string name="tax_disclaimer">Calculadora orientativa. Método FIFO y regla de los 2 meses (Art. 33.5 LIRPF). Consulta a un asesor fiscal para tu declaración oficial.</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="ai_title">IA</string>
+    <string name="ai_unavailable">IA no disponible: el backend no tiene configurada la clave de Anthropic (ANTHROPIC_API_KEY).</string>
+    <string name="ai_input_hint">Pregunta algo sobre los mercados…</string>
+</resources>

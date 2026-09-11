@@ -1,0 +1,4 @@
+<resources>
+    <string name="screener_title">Screener</string>
+    <string name="screener_search_hint">Buscar símbolo…</string>
+</resources>

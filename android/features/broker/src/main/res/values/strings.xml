@@ -1,0 +1,26 @@
+<resources>
+    <string name="broker_title">Broker</string>
+    <string name="broker_account_title">Cuenta simulada</string>
+    <string name="broker_reset">Reiniciar</string>
+    <string name="broker_cash">Efectivo</string>
+    <string name="broker_equity">Equity total</string>
+    <string name="broker_pnl">P&amp;L total</string>
+    <string name="broker_pnl_pct">P&amp;L %</string>
+    <string name="broker_new_order">Nueva orden</string>
+    <string name="broker_buy">Comprar</string>
+    <string name="broker_sell">Vender</string>
+    <string name="broker_symbol">Símbolo</string>
+    <string name="broker_quantity">Cantidad</string>
+    <string name="broker_price_hint">Precio (vacío = precio de mercado)</string>
+    <string name="broker_stop_loss">Stop loss (opcional)</string>
+    <string name="broker_take_profit">Take profit (opcional)</string>
+    <string name="broker_submit_error">Revisa símbolo y cantidad.</string>
+    <string name="broker_open_positions">Posiciones abiertas</string>
+    <string name="broker_no_positions">Sin posiciones abiertas</string>
+    <string name="broker_history">Historial</string>
+    <string name="broker_no_history">Sin operaciones todavía</string>
+    <string name="broker_sell_all">Vender</string>
+    <string name="broker_stats">%1$d operaciones · %2$s%% acierto</string>
+    <string name="broker_order_buy">COMPRA</string>
+    <string name="broker_order_sell">VENTA</string>
+</resources>
