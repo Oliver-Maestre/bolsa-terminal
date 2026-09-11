@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
-import { streamChat, getAiRecommendationText, isAiAvailable } from '../services/aiService';
+import { streamChat, getAiRecommendationText, isAiAvailable, getAiModel } from '../services/aiService';
 import { getAllRecommendations } from '../services/investmentAnalyzer';
 
 const router = Router();
 
 // GET /api/ai/status
 router.get('/status', (_req: Request, res: Response) => {
-  res.json({ available: isAiAvailable(), model: isAiAvailable() ? 'claude-opus-4-5' : 'fallback' });
+  res.json({ available: isAiAvailable(), model: getAiModel() });
 });
 
 // GET /api/ai/recommendations — algorithmic recommendations (no AI needed)
@@ -35,6 +35,7 @@ router.post('/chat', async (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
   try {

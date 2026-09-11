@@ -1,20 +1,41 @@
 /**
- * AI Service — wraps Anthropic Claude API
+ * AI Service — wraps Anthropic Claude and Google Gemini APIs
  * Falls back to rule-based responses if no API key is set
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI } from '@google/genai';
 import { buildMarketContext, getAllRecommendations } from './investmentAnalyzer';
 import { broker } from './paperBroker';
 import * as cache from './cache';
 import { ScreenerItem } from '../types/index';
 
-const client = process.env.ANTHROPIC_API_KEY
+const anthropicClient = process.env.ANTHROPIC_API_KEY
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   : null;
 
+const geminiClient = process.env.GEMINI_API_KEY
+  ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+  : null;
+
+// AI_PROVIDER lets you pin the provider explicitly; otherwise prefer
+// Gemini (free tier, no card required) over Anthropic (paid) when both are set.
+type AiProvider = 'anthropic' | 'gemini';
+const provider: AiProvider | null =
+  ((process.env.AI_PROVIDER || undefined) as AiProvider | undefined) ??
+  (geminiClient ? 'gemini' : anthropicClient ? 'anthropic' : null);
+
+const GEMINI_MODEL = 'gemini-3.6-flash';
+const ANTHROPIC_MODEL = 'claude-opus-4-5';
+
 export function isAiAvailable(): boolean {
-  return client !== null;
+  return anthropicClient !== null || geminiClient !== null;
+}
+
+export function getAiModel(): string {
+  if (provider === 'gemini') return GEMINI_MODEL;
+  if (provider === 'anthropic') return ANTHROPIC_MODEL;
+  return 'fallback';
 }
 
 const SYSTEM_PROMPT = `Eres un asistente de análisis financiero experto integrado en un dashboard de trading profesional.
@@ -70,7 +91,7 @@ export async function* streamChat(
   messages: ChatMessage[],
   includeContext = true
 ): AsyncGenerator<string> {
-  if (!client) {
+  if (!provider) {
     yield* streamFallback(messages[messages.length - 1]?.content ?? '');
     return;
   }
@@ -80,10 +101,22 @@ export async function* streamChat(
     ? `${SYSTEM_PROMPT}\n\n${contextMessage}`
     : SYSTEM_PROMPT;
 
-  const stream = client.messages.stream({
-    model: 'claude-opus-4-5',
+  if (provider === 'gemini') {
+    yield* streamGemini(messages, systemWithContext);
+    return;
+  }
+
+  yield* streamAnthropic(messages, systemWithContext);
+}
+
+async function* streamAnthropic(
+  messages: ChatMessage[],
+  system: string
+): AsyncGenerator<string> {
+  const stream = anthropicClient!.messages.stream({
+    model: ANTHROPIC_MODEL,
     max_tokens: 1024,
-    system: systemWithContext,
+    system,
     messages: messages.map((m) => ({ role: m.role, content: m.content })),
   });
 
@@ -97,12 +130,31 @@ export async function* streamChat(
   }
 }
 
+async function* streamGemini(
+  messages: ChatMessage[],
+  system: string
+): AsyncGenerator<string> {
+  const stream = await geminiClient!.models.generateContentStream({
+    model: GEMINI_MODEL,
+    config: { systemInstruction: system },
+    contents: messages.map((m) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    })),
+  });
+
+  for await (const chunk of stream) {
+    const text = chunk.text;
+    if (text) yield text;
+  }
+}
+
 /** Non-streaming for recommendations endpoint */
 export async function getAiRecommendationText(): Promise<string> {
   const recs = getAllRecommendations();
   const context = buildMarketContext();
 
-  if (!client) {
+  if (!provider) {
     return buildFallbackRecommendations();
   }
 

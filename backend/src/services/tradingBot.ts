@@ -12,7 +12,10 @@
 import { broker } from './paperBroker';
 import { ScreenerItem } from '../types/index';
 import * as cache from './cache';
+import { loadJSON, saveJSON } from './persistence';
 import { v4 as uuid } from 'uuid';
+
+const STATE_FILE = 'bot-state.json';
 
 export type BotMode = 'conservative' | 'moderate' | 'aggressive';
 
@@ -47,6 +50,12 @@ const MODE_PARAMS: Record<BotMode, {
   aggressive:   { minScore: 2, maxRSI: 50, stopLossPct: 12, takeProfitPct: 30, maxPositions: 8, positionSizePct: 18, sellScore: -2 },
 };
 
+interface PersistedBotState {
+  config: BotConfig;
+  log: BotLogEntry[];
+  scanCount: number;
+}
+
 class TradingBot {
   private config: BotConfig = {
     enabled: false,
@@ -57,6 +66,27 @@ class TradingBot {
   private log: BotLogEntry[] = [];
   private timer: NodeJS.Timeout | null = null;
   private scanCount = 0;
+
+  constructor() {
+    const persisted = loadJSON<PersistedBotState | null>(STATE_FILE, null);
+    if (persisted) {
+      this.config = persisted.config;
+      this.log = persisted.log;
+      this.scanCount = persisted.scanCount;
+      if (this.config.enabled) {
+        this.addLog('INFO', undefined, 'Bot reanudado tras reinicio del servidor.');
+        this.scheduleNext();
+      }
+    }
+  }
+
+  private persist() {
+    saveJSON<PersistedBotState>(STATE_FILE, {
+      config: this.config,
+      log: this.log,
+      scanCount: this.scanCount,
+    });
+  }
 
   configure(updates: Partial<BotConfig>) {
     const wasEnabled = this.config.enabled;
@@ -73,6 +103,7 @@ class TradingBot {
       this.stop();
       this.scheduleNext();
     }
+    this.persist();
   }
 
   stop() {
@@ -213,6 +244,7 @@ class TradingBot {
     };
     this.log.unshift(entry);
     if (this.log.length > 500) this.log.pop(); // keep last 500 entries
+    this.persist();
   }
 
   getStatus() {

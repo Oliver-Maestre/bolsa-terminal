@@ -33,3 +33,18 @@ coverage/
 
 # Temp
 tmp/
+
+# Local persisted broker/bot state (backend/src/services/persistence.ts)
+backend/data/
+
+# Xcode (macos/)
+macos/**/xcuserdata/
+macos/**/DerivedData/
+macos/**/*.xcuserstate
+macos/BolsaTerminal.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Android (android/)
+android/**/build/
+android/**/.gradle/
+android/.kotlin/
+android/local.properties

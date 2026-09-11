@@ -4,7 +4,11 @@ Dashboard financiero full-stack con datos de mercado en tiempo real, broker de p
 
 ![Stack](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript%20%2B%20Vite-blue?logo=react)
 ![Stack](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express%20%2B%20TypeScript-green?logo=node.js)
+![Stack](https://img.shields.io/badge/macOS-SwiftUI-lightgrey?logo=apple)
+![Stack](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-3DDC84?logo=android)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+
+Además de la web, el proyecto incluye **apps nativas** para macOS (SwiftUI) y Android (Kotlin + Jetpack Compose) con paridad funcional completa frente a las 9 secciones de la web — ver [`macos/README.md`](macos/README.md) y [`android/README.md`](android/README.md).
 
 ---
 
@@ -19,7 +23,7 @@ Dashboard financiero full-stack con datos de mercado en tiempo real, broker de p
 | **Portfolio** | Gestiona tus posiciones manualmente con métricas y gráfico circular en tiempo real |
 | **Broker** | Paper trading con $100.000 virtuales. Stop Loss, Take Profit, cambio EUR/USD en tiempo real |
 | **Bot automático** | Escanea el mercado y opera solo. Modos conservador, moderado y agresivo |
-| **Agente IA** | Chat con Claude AI + recomendaciones algorítmicas para corto, medio y largo plazo |
+| **Agente IA** | Chat con Gemini o Claude AI (configurable) + recomendaciones algorítmicas para corto, medio y largo plazo |
 | **Simulador** | Backtesting con datos reales, proyecciones Monte Carlo y calculadora fiscal IRPF 2024 |
 | **Guía del inversor** | Panel flotante contextual con consejos según la página en la que estés |
 
@@ -43,8 +47,21 @@ bolsa-terminal/
 │   └── src/
 │       ├── routes/        # Endpoints REST + SSE
 │       ├── services/      # Lógica de negocio y fuentes de datos
+│       ├── middleware/    # Auth por token compartido (apps nativas / cloud)
 │       ├── config/        # Mercados, tickers y configuración
 │       └── types/         # Tipos compartidos
+│
+├── macos/             # App nativa macOS — SwiftUI, ver macos/README.md
+│   └── BolsaTerminal/
+│       ├── Core/           # Networking (URLSession/SSE), Models, Keychain
+│       ├── DesignSystem/   # Colores, tipografía, componentes
+│       └── Features/       # Dashboard, Screener, Chart, Broker, Bot, AI...
+│
+├── android/           # App nativa Android — Kotlin + Jetpack Compose, ver android/README.md
+│   ├── app/                # NavHost, MainActivity
+│   ├── core/                # designsystem, network, model, data, common
+│   ├── domain/               # Casos de uso (Kotlin JVM puro)
+│   └── features/            # Un módulo Gradle por sección
 │
 └── docs/              # Documentación (MD + PDF)
     ├── guia-mercados-financieros.md
@@ -96,11 +113,19 @@ cd ../frontend && npm install
 
 ### 3. Configurar variables de entorno (opcional)
 
-Crea el archivo `backend/.env`:
+Copia la plantilla y rellena lo que necesites:
+
+```bash
+cp backend/.env.example backend/.env
+```
 
 ```env
-# Claude AI — activa el chat inteligente (obtén tu clave en console.anthropic.com)
-ANTHROPIC_API_KEY=sk-ant-...
+# Chat IA — proveedor automático: Gemini si hay GEMINI_API_KEY (gratis, sin
+# tarjeta — aistudio.google.com/apikey), si no Anthropic (de pago). Fuerza uno
+# con AI_PROVIDER=gemini|anthropic.
+AI_PROVIDER=
+GEMINI_API_KEY=
+ANTHROPIC_API_KEY=
 
 # Financial Modeling Prep — fuente de datos adicional (financialmodelingprep.com)
 FMP_API_KEY=tu_clave_aqui
@@ -109,7 +134,7 @@ FMP_API_KEY=tu_clave_aqui
 ALPHA_VANTAGE_KEY=tu_clave_aqui
 ```
 
-> Sin estas claves el sistema funciona igualmente con Yahoo Finance, Stooq y CoinGecko (gratuitos y sin límite relevante).
+> Sin ninguna clave el sistema funciona igualmente: cotizaciones vía Yahoo Finance/Stooq/CoinGecko (gratuitos) y chat IA con respuestas algorítmicas de respaldo.
 
 ### 4. Arrancar los servidores
 
@@ -144,9 +169,11 @@ Abre **http://localhost:5173** en tu navegador.
 - **tsx watch** — hot reload en desarrollo
 - **yahoo-finance2** — fuente de datos principal
 - **node-cache** — caché en memoria con TTL
-- **@anthropic-ai/sdk** — integración con Claude AI
+- **@google/genai** — chat IA con Gemini (gratis, proveedor por defecto)
+- **@anthropic-ai/sdk** — chat IA con Claude (de pago, alternativa configurable)
 - **SSE (Server-Sent Events)** — streaming del chat IA y logs del bot
 - **dotenv** — gestión de variables de entorno
+- **Docker + Fly.io** — listo para despliegue cloud always-on (`backend/Dockerfile`, `backend/fly.toml`) — necesario para que el bot vigile stop-loss/take-profit 24/7 y para servir a las apps nativas además de la web
 
 ---
 
@@ -193,10 +220,28 @@ Calcula el impacto fiscal de tus operaciones según la legislación española vi
 
 | Variable | Requerida | Descripción |
 |----------|-----------|-------------|
-| `ANTHROPIC_API_KEY` | No | Activa el chat conversacional con Claude AI |
+| `AI_PROVIDER` | No | Fuerza el proveedor de chat IA: `gemini` o `anthropic`. Vacío = auto (Gemini si hay clave, si no Anthropic) |
+| `GEMINI_API_KEY` | No | Activa el chat con Google Gemini — gratis, sin tarjeta ([aistudio.google.com/apikey](https://aistudio.google.com/apikey)) |
+| `ANTHROPIC_API_KEY` | No | Activa el chat con Claude AI — de pago |
 | `FMP_API_KEY` | No | Financial Modeling Prep (250 req/día gratis) |
 | `ALPHA_VANTAGE_KEY` | No | Alpha Vantage (25 req/día gratis) |
 | `PORT` | No | Puerto del backend (defecto: 3001) |
+| `API_TOKEN` | No | Token compartido (`Bearer`) que protege `/api/*` — para exponer el backend a las apps nativas en la nube. Vacío = sin auth (dev local) |
+| `CORS_ORIGINS` | No | Orígenes permitidos para el frontend web, separados por coma (defecto: `localhost:5173,localhost:4173`) |
+| `PERSIST_DIR` | No | Carpeta donde persisten el estado del broker y del bot como JSON (defecto: `./data`) — en cloud debe ser un volumen montado |
+
+---
+
+## 📱 Apps nativas
+
+Además de la web, el mismo backend sirve dos apps 100% nativas (sin wrappers tipo Electron/Capacitor) con paridad funcional completa en las 9 secciones:
+
+| App | Stack | Guía |
+|-----|-------|------|
+| **macOS** | SwiftUI + Swift Charts + SwiftData + Keychain | [`macos/README.md`](macos/README.md) |
+| **Android** | Kotlin + Jetpack Compose + Room + Hilt + Retrofit | [`android/README.md`](android/README.md) |
+
+Ambas apuntan por defecto al backend local (`localhost` en macOS, `10.0.2.2` en el emulador Android) y están listas para apuntar a un backend desplegado en la nube en cuanto `API_TOKEN` esté configurado — ver la tabla de variables de entorno arriba.
 
 ---
 

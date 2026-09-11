@@ -44,16 +44,24 @@ router.get('/stream', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
   let lastCount = 0;
 
+  // Always write something every tick — a silent keep-alive connection with
+  // no byte flow can sit unflushed by HTTP clients (observed with
+  // URLSession's streaming delegate) and gets closed by idle-timeout proxies
+  // in front of cloud deployments. A comment line is spec-legal SSE and
+  // ignored by clients that only look for `data: ` lines.
   const send = () => {
     const log = tradingBot.getLog(100);
     if (log.length !== lastCount) {
       const newEntries = log.slice(0, log.length - lastCount);
       lastCount = log.length;
       res.write(`data: ${JSON.stringify(newEntries)}\n\n`);
+    } else {
+      res.write(': ping\n\n');
     }
   };
 

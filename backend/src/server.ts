@@ -20,17 +20,48 @@ import { generateMockScreener } from './services/mockData';
 import { getQuoteAggregated, getHistoryAggregated } from './services/dataAggregator';
 import * as cache from './services/cache';
 import { ScreenerItem } from './types/index';
+import { requireApiToken } from './middleware/auth';
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
+const DEFAULT_ORIGINS = ['http://localhost:5173', 'http://localhost:4173'];
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+  : DEFAULT_ORIGINS;
+
 // Middleware
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:4173'] }));
-app.use(compression() as any);
+app.use(cors({ origin: corsOrigins }));
+// Never compress SSE streams — gzip buffers chunks and breaks real-time delivery.
+// IMPORTANT: use req.originalUrl, not req.path — this filter runs lazily on
+// the first res.write() *inside* the mounted router, by which point req.path
+// has already been rewritten relative to the router's mount point (e.g.
+// '/stream' instead of '/api/bot/stream'), so a req.path check silently
+// never matches and gzip gets applied to a never-ending stream, which then
+// hangs forever for any client that requests gzip (curl doesn't by default;
+// URLSession does), because zlib never flushes its tiny buffered writes.
+app.use(compression({
+  filter: (req, res) => {
+    if (req.originalUrl.startsWith('/api/bot/stream') || req.originalUrl.startsWith('/api/ai/chat')) return false;
+    return compression.filter(req, res);
+  },
+}) as any);
 app.use(express.json());
 
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true });
 app.use(limiter);
+
+// Health check — no token required, so cloud providers can probe it freely.
+app.get('/api/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    cacheStats: cache.stats(),
+    screenerCount: (cache.get<ScreenerItem[]>('screener:all') ?? []).length,
+  });
+});
+
+app.use('/api', requireApiToken);
 
 // Routes
 app.use('/api/quotes',    quotesRouter);
@@ -42,16 +73,6 @@ app.use('/api/broker',    brokerRouter);
 app.use('/api/bot',       botRouter);
 app.use('/api/ai',        aiRouter);
 app.use('/api/simulator', simulatorRouter);
-
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    cacheStats: cache.stats(),
-    screenerCount: (cache.get<ScreenerItem[]>('screener:all') ?? []).length,
-  });
-});
 
 // ─── Background screener refresh ─────────────────────────────────────────────
 // Uses the full aggregator chain: Yahoo → Stooq → CoinGecko → FMP → Mock

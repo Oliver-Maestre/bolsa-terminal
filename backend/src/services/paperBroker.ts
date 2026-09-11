@@ -4,8 +4,10 @@
  */
 
 import { v4 as uuid } from 'uuid';
+import { loadJSON, saveJSON } from './persistence';
 
 const INITIAL_BALANCE = 100_000; // $100k starting capital
+const STATE_FILE = 'broker-state.json';
 
 export interface BrokerOrder {
   id: string;
@@ -54,14 +56,48 @@ export interface BrokerAccount {
 
 const FEE_RATE = 0.001; // 0.1% per trade
 
+type BrokerPositionState = { quantity: number; avgCost: number; stopLoss?: number; takeProfit?: number; openedAt: number; source: 'MANUAL' | 'BOT' };
+
+interface PersistedBrokerState {
+  cash: number;
+  positions: [string, BrokerPositionState][];
+  orders: BrokerOrder[];
+  totalFeesPaid: number;
+  winCount: number;
+  lossCount: number;
+}
+
 class PaperBroker {
   private cash = INITIAL_BALANCE;
-  private positions = new Map<string, { quantity: number; avgCost: number; stopLoss?: number; takeProfit?: number; openedAt: number; source: 'MANUAL' | 'BOT' }>();
+  private positions = new Map<string, BrokerPositionState>();
   private orders: BrokerOrder[] = [];
   private prices = new Map<string, number>();
   private totalFeesPaid = 0;
   private winCount = 0;
   private lossCount = 0;
+
+  constructor() {
+    const persisted = loadJSON<PersistedBrokerState | null>(STATE_FILE, null);
+    if (persisted) {
+      this.cash = persisted.cash;
+      this.positions = new Map(persisted.positions);
+      this.orders = persisted.orders;
+      this.totalFeesPaid = persisted.totalFeesPaid;
+      this.winCount = persisted.winCount;
+      this.lossCount = persisted.lossCount;
+    }
+  }
+
+  private persist() {
+    saveJSON<PersistedBrokerState>(STATE_FILE, {
+      cash: this.cash,
+      positions: [...this.positions.entries()],
+      orders: this.orders,
+      totalFeesPaid: this.totalFeesPaid,
+      winCount: this.winCount,
+      lossCount: this.lossCount,
+    });
+  }
 
   updatePrice(symbol: string, price: number) {
     this.prices.set(symbol.toUpperCase(), price);
@@ -112,6 +148,7 @@ class PaperBroker {
       status: 'FILLED', timestamp: Date.now(), source, reason,
     };
     this.orders.push(order);
+    this.persist();
     return { success: true, order };
   }
 
@@ -147,6 +184,7 @@ class PaperBroker {
       status: 'FILLED', timestamp: Date.now(), source, reason,
     };
     this.orders.push(order);
+    this.persist();
     return { success: true, order, pnl: tradePnL };
   }
 
@@ -211,6 +249,7 @@ class PaperBroker {
     this.totalFeesPaid = 0;
     this.winCount = 0;
     this.lossCount = 0;
+    this.persist();
   }
 }
 

@@ -1,0 +1,39 @@
+# Fly.io app config. Ajusta `app` (nombre único global) y `primary_region`
+# antes del primer `fly launch`/`fly deploy`.
+#
+# Setup inicial:
+#   fly volumes create bolsa_data --region mad --size 1
+#   fly secrets set API_TOKEN=<openssl rand -hex 32> ANTHROPIC_API_KEY=... FMP_API_KEY=... ALPHA_VANTAGE_KEY=...
+#   fly deploy
+
+app = "bolsa-terminal-api"
+primary_region = "mad"
+
+[build]
+
+[env]
+  PORT = "3001"
+  PERSIST_DIR = "/data"
+  CORS_ORIGINS = "http://localhost:5173,http://localhost:4173"
+
+[mounts]
+  source = "bolsa_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
