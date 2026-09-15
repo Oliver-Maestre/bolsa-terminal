@@ -18,6 +18,7 @@ final class ChartViewModel {
     var searchQuery: String = ""
     var searchResults: [SearchResult] = []
     private var searchTask: Task<Void, Never>?
+    private var consecutiveRefreshFailures = 0
 
     func load(symbol: String? = nil) async {
         if let symbol, !symbol.isEmpty {
@@ -27,13 +28,42 @@ final class ChartViewModel {
 
         state = .loading
         do {
-            history = try await APIClient.shared.request(
-                Endpoints.history(self.symbol, period: period, interval: "1d")
-            )
+            try await fetch()
             state = .loaded
         } catch {
             state = .error((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
         }
+    }
+
+    /// Periodic background refresh for the currently selected symbol/period —
+    /// no loading flash, silently ignores transient failures. After 3
+    /// consecutive failures falls back to a full `load()` so a sustained
+    /// outage surfaces as an actionable error instead of staying stuck.
+    func refresh() async {
+        guard !symbol.isEmpty else { return }
+        do {
+            try await fetch()
+            state = .loaded
+            consecutiveRefreshFailures = 0
+        } catch {
+            consecutiveRefreshFailures += 1
+            if consecutiveRefreshFailures >= 3 {
+                consecutiveRefreshFailures = 0
+                await load()
+            }
+        }
+    }
+
+    private func fetch() async throws {
+        let result: HistoryResponse = try await APIClient.shared.request(
+            Endpoints.history(symbol, period: period, interval: "1d")
+        )
+        // A backend hiccup can return a valid-but-empty bars array rather
+        // than actually failing — don't let that silently wipe the chart.
+        guard !result.bars.isEmpty || (history?.bars.isEmpty ?? true) else {
+            throw APIError.server(status: 200, message: "Empty response")
+        }
+        history = result
     }
 
     func search(_ query: String) {

@@ -20,6 +20,12 @@ struct BrokerView: View {
         .background(Color.btBackground)
         .navigationTitle("Broker")
         .task { await viewModel.load() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh()
+            }
+        }
         .toolbar {
             ToolbarItem {
                 Button {

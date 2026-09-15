@@ -19,6 +19,12 @@ struct ScreenerView: View {
         .navigationTitle("Screener")
         .searchable(text: $viewModel.searchText, prompt: "Buscar símbolo…")
         .task { await viewModel.load() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh()
+            }
+        }
         .toolbar {
             ToolbarItem {
                 Button {

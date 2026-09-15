@@ -13,6 +13,12 @@ struct ChartView: View {
         .background(Color.btBackground)
         .navigationTitle("Gráfico")
         .task { await viewModel.load() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh()
+            }
+        }
     }
 
     private var header: some View {

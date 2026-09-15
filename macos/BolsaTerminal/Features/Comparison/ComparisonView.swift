@@ -15,6 +15,12 @@ struct ComparisonView: View {
         .background(Color.btBackground)
         .navigationTitle("Comparativa")
         .task { await viewModel.load() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh()
+            }
+        }
     }
 
     private var header: some View {

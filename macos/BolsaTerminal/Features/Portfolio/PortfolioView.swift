@@ -20,6 +20,12 @@ struct PortfolioView: View {
         .background(Color.btBackground)
         .navigationTitle("Cartera")
         .task { await viewModel.refreshQuotes(for: positions) }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh(for: positions)
+            }
+        }
         .toolbar {
             ToolbarItem {
                 Button {

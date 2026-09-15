@@ -29,6 +29,7 @@ final class BrokerViewModel {
     var orderTakeProfit: String = ""
     var isSubmitting = false
     var submitError: String?
+    private var consecutiveRefreshFailures = 0
 
     func load() async {
         state = .loading
@@ -37,6 +38,25 @@ final class BrokerViewModel {
             state = .loaded
         } catch {
             state = .error((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
+        }
+    }
+
+    /// Periodic background refresh — no loading flash, silently ignores
+    /// transient failures, and never touches the in-progress order form
+    /// fields so a refresh can't wipe what the user is typing. After 3
+    /// consecutive failures falls back to a full `load()` so a sustained
+    /// outage surfaces as an actionable error instead of staying stuck.
+    func refresh() async {
+        do {
+            account = try await APIClient.shared.request(Endpoints.brokerAccount)
+            state = .loaded
+            consecutiveRefreshFailures = 0
+        } catch {
+            consecutiveRefreshFailures += 1
+            if consecutiveRefreshFailures >= 3 {
+                consecutiveRefreshFailures = 0
+                await load()
+            }
         }
     }
 

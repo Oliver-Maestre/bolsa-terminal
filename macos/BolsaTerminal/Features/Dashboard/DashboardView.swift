@@ -24,6 +24,12 @@ struct DashboardView: View {
         .background(Color.btBackground)
         .navigationTitle("Dashboard")
         .task { await viewModel.load() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                await viewModel.refresh()
+            }
+        }
         .toolbar {
             ToolbarItem {
                 Button {

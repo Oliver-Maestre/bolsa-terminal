@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct BolsaTerminalApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -9,6 +11,7 @@ struct BolsaTerminalApp: App {
                 .preferredColorScheme(.dark)
         }
         .defaultSize(width: 1280, height: 800)
+        .defaultPosition(.center)
         .modelContainer(for: PortfolioPositionEntity.self)
 
         Settings {
