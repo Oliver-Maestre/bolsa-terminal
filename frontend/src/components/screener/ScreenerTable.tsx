@@ -12,6 +12,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import {
   ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine,
 } from 'recharts';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 function fmtLarge(v?: number) {
   if (!v) return '—';
@@ -54,7 +55,7 @@ export function ScreenerTable() {
   const { data, isLoading } = useSWR(
     ['screener', JSON.stringify(params)],
     () => fetchScreener(params),
-    { refreshInterval: 60000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   function sortBy(key: SK) {

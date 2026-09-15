@@ -4,12 +4,13 @@ import { fetchMarketOverview } from '../../api/client';
 import { Sparkline } from '../ui/Sparkline';
 import { ColoredValue } from '../ui/PriceChange';
 import { Skeleton } from '../ui/LoadingSkeleton';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 const FLAGS: Record<string, string> = { NASDAQ: '🇺🇸', NYSE: '🇺🇸', BME: '🇪🇸', LSE: '🇬🇧', CRYPTO: '₿' };
 
 export function MarketOverview() {
   const navigate = useNavigate();
-  const { data, isLoading } = useSWR('/markets/overview', fetchMarketOverview, { refreshInterval: 60000 });
+  const { data, isLoading } = useSWR('/markets/overview', fetchMarketOverview, { refreshInterval: REFRESH_INTERVAL_MS });
 
   if (isLoading || !data) {
     return (

@@ -4,6 +4,7 @@ import { usePortfolio } from '../../store';
 import { fetchBatchQuotes, fetchBrokerAccount } from '../../api/client';
 import { Sparkline } from '../ui/Sparkline';
 import { TrendingUp, TrendingDown, Briefcase, Landmark } from 'lucide-react';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 function pct(v: number) { return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`; }
 
@@ -15,9 +16,9 @@ export function MyProducts() {
   const { data: quotesArr } = useSWR(
     symbols.length ? ['my-products-quotes', ...symbols] : null,
     () => fetchBatchQuotes(symbols),
-    { refreshInterval: 15000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
-  const { data: brokerAccount } = useSWR('/broker/account', fetchBrokerAccount, { refreshInterval: 10000 });
+  const { data: brokerAccount } = useSWR('/broker/account', fetchBrokerAccount, { refreshInterval: REFRESH_INTERVAL_MS });
 
   const quoteMap = Object.fromEntries((quotesArr ?? []).map((q: any) => [q.symbol, q]));
   const brokerPositions = brokerAccount?.positions ?? [];

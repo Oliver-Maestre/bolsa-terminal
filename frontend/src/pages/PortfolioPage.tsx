@@ -9,6 +9,7 @@ import { PortfolioTable } from '../components/portfolio/PortfolioTable';
 import { AddPositionModal } from '../components/portfolio/AddPositionModal';
 import { computeMetrics, PortfolioSummaryCards } from '../components/portfolio/PortfolioSummary';
 import toast from 'react-hot-toast';
+import { REFRESH_INTERVAL_MS } from '../config/refresh';
 
 const PIE_COLORS = ['#3b82f6', '#22c55e', '#f97316', '#a855f7', '#eab308', '#ef4444', '#06b6d4', '#ec4899'];
 
@@ -21,7 +22,7 @@ export function PortfolioPage() {
   const { data: quotesArr } = useSWR(
     symbols.length ? ['portfolio-quotes', ...symbols] : null,
     () => fetchBatchQuotes(symbols),
-    { refreshInterval: 15000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   const quoteMap: Record<string, QuoteSummary> = Object.fromEntries(

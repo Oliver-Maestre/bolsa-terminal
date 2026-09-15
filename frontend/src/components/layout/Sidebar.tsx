@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { fetchBatchQuotes } from '../../api/client';
 import { useWatchlist } from '../../store';
 import { ColoredValue } from '../ui/PriceChange';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -35,7 +36,7 @@ export function Sidebar() {
   const { data: quotes } = useSWR(
     symbols.length ? ['wl-quotes', symbols.join(',')] : null,
     () => fetchBatchQuotes(symbols),
-    { refreshInterval: 15000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   const qMap = Object.fromEntries((quotes ?? []).map((q) => [q.symbol, q]));

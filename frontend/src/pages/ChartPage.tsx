@@ -11,6 +11,7 @@ import { RecommendationCard } from '../components/quote/RecommendationCard';
 import { AddPositionModal } from '../components/portfolio/AddPositionModal';
 import { usePortfolio } from '../store';
 import toast from 'react-hot-toast';
+import { REFRESH_INTERVAL_MS } from '../config/refresh';
 
 type IndicKey = 'showMA' | 'showBB' | 'showRSI' | 'showMACD';
 
@@ -29,13 +30,13 @@ export function ChartPage() {
   const { data: hist, isLoading: histLoading } = useSWR(
     sym ? ['/history', sym, period, interval] : null,
     () => fetchHistory(sym, period, interval),
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   const { data: quote } = useSWR(
     sym ? ['/quote', sym] : null,
     () => fetchQuote(sym),
-    { refreshInterval: 15000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   function toggle(k: IndicKey) {

@@ -3,6 +3,7 @@ import { createChart, IChartApi, ISeriesApi, ColorType, CrosshairMode, Time, Lin
 import useSWR from 'swr';
 import { fetchHistory } from '../../api/client';
 import { X, Plus } from 'lucide-react';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 const LINE_COLORS = ['#3b82f6', '#22c55e', '#f97316', '#a855f7', '#eab308'];
 
@@ -31,7 +32,7 @@ export function ComparisonTool({ symbols, onRemove, onAdd }: Props) {
       const results = await Promise.all(symbols.map((s) => fetchHistory(s, period, '1d')));
       return results.map((r, i) => ({ symbol: symbols[i], bars: r.bars }));
     },
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   // Create chart once on mount

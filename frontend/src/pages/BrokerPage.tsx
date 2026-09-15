@@ -7,6 +7,7 @@ import { OpenPositions } from '../components/broker/OpenPositions';
 import { TradeHistory } from '../components/broker/TradeHistory';
 import { TradingPanel } from '../components/broker/TradingPanel';
 import toast from 'react-hot-toast';
+import { REFRESH_INTERVAL_MS } from '../config/refresh';
 
 type Tab = 'positions' | 'history';
 
@@ -20,14 +21,14 @@ export function BrokerPage() {
   const { data: account, mutate } = useSWR<BrokerAccount>(
     '/broker/account',
     fetchBrokerAccount,
-    { refreshInterval: 5000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   // Fetch live EUR/USD rate (EURUSD=X = how many USD per 1 EUR)
   const { data: fxQuote } = useSWR(
     '/quote/EURUSD=X',
     () => fetchQuote('EURUSD=X'),
-    { refreshInterval: 60000, revalidateOnFocus: false }
+    { refreshInterval: REFRESH_INTERVAL_MS, revalidateOnFocus: false }
   );
   const eurRate = fxQuote?.regularMarketPrice ?? FALLBACK_EUR_RATE;
 

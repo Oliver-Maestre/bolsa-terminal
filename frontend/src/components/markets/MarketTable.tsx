@@ -8,6 +8,7 @@ import { Sparkline } from '../ui/Sparkline';
 import { ColoredValue } from '../ui/PriceChange';
 import { TableSkeleton } from '../ui/LoadingSkeleton';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 function fmtLarge(v?: number) {
   if (!v) return '—';
@@ -37,7 +38,7 @@ export function MarketTable({ exchange }: { exchange?: string }) {
   const { data, isLoading } = useSWR(
     ['screener-tbl', JSON.stringify(params)],
     () => fetchScreener(params),
-    { refreshInterval: 30000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   function sort(key: SK) {

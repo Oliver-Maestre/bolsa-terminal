@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { fetchQuote, placeBrokerOrder } from '../../api/client';
 import toast from 'react-hot-toast';
 import { DollarSign, Euro } from 'lucide-react';
+import { REFRESH_INTERVAL_MS } from '../../config/refresh';
 
 interface Props {
   defaultSymbol?: string;
@@ -27,7 +28,7 @@ export function TradingPanel({ defaultSymbol = 'AAPL', onTrade, currency, eurRat
   const { data: quote, isLoading: qLoading } = useSWR(
     symInput ? ['/quote', symInput] : null,
     () => fetchQuote(symInput),
-    { refreshInterval: 10000 }
+    { refreshInterval: REFRESH_INTERVAL_MS }
   );
 
   // All internal logic stays in USD; eurRate = USD per EUR
