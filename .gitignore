@@ -40,8 +40,12 @@ backend/data/
 # Xcode (macos/)
 macos/**/xcuserdata/
 macos/**/DerivedData/
+macos/**/DerivedDataRelease/
 macos/**/*.xcuserstate
 macos/BolsaTerminal.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Built installer artifacts (regenerate via macos/README.md instructions)
+macos/dist/
 
 # Android (android/)
 android/**/build/
