@@ -22,6 +22,7 @@ class ScreenerViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    private var consecutiveRefreshFailures = 0
 
     init {
         load()
@@ -31,11 +32,43 @@ class ScreenerViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = UiState.Loading
             try {
-                _state.value = UiState.Loaded(getScreener())
+                _state.value = UiState.Loaded(fetch())
             } catch (e: Exception) {
                 _state.value = UiState.Error(e.message.orEmpty())
             }
         }
+    }
+
+    /**
+     * Periodic silent refresh — keeps showing the last good data on
+     * failure, no loading spinner. After 3 consecutive failures falls back
+     * to a full [load] so a sustained outage surfaces as an actionable
+     * error instead of staying stuck on stale/empty data forever.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                _state.value = UiState.Loaded(fetch())
+                consecutiveRefreshFailures = 0
+            } catch (_: Exception) {
+                consecutiveRefreshFailures++
+                if (consecutiveRefreshFailures >= 3) {
+                    consecutiveRefreshFailures = 0
+                    load()
+                }
+            }
+        }
+    }
+
+    private suspend fun fetch(): List<ScreenerItem> {
+        val result = getScreener()
+        // A backend hiccup can return a valid-but-empty list rather than
+        // actually failing — don't let that silently wipe good data on screen.
+        val current = (_state.value as? UiState.Loaded<List<ScreenerItem>>)?.data
+        if (result.isEmpty() && current?.isNotEmpty() == true) {
+            throw IllegalStateException("Empty screener response")
+        }
+        return result
     }
 
     fun onSearchQueryChange(query: String) {

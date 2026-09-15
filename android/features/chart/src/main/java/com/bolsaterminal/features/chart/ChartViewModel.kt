@@ -42,6 +42,7 @@ class ChartViewModel @Inject constructor(
     val searchResults: StateFlow<List<SearchResult>> = _searchResults.asStateFlow()
 
     private var searchJob: Job? = null
+    private var consecutiveRefreshFailures = 0
 
     init {
         load()
@@ -52,11 +53,43 @@ class ChartViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = UiState.Loading
             try {
-                _state.value = UiState.Loaded(getHistory(_symbol.value, _period.value, "1d"))
+                _state.value = UiState.Loaded(fetch())
             } catch (e: Exception) {
                 _state.value = UiState.Error(e.message.orEmpty())
             }
         }
+    }
+
+    /**
+     * Periodic silent refresh of the currently selected symbol/period — no
+     * loading spinner. After 3 consecutive failures falls back to a full
+     * [load] so a sustained outage surfaces as an actionable error instead
+     * of staying stuck on stale/empty data forever.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                _state.value = UiState.Loaded(fetch())
+                consecutiveRefreshFailures = 0
+            } catch (_: Exception) {
+                consecutiveRefreshFailures++
+                if (consecutiveRefreshFailures >= 3) {
+                    consecutiveRefreshFailures = 0
+                    load()
+                }
+            }
+        }
+    }
+
+    private suspend fun fetch(): HistoryResponse {
+        val result = getHistory(_symbol.value, _period.value, "1d")
+        // A backend hiccup can return a valid-but-empty bars list rather
+        // than actually failing — don't let that silently wipe the chart.
+        val current = (_state.value as? UiState.Loaded<HistoryResponse>)?.data
+        if (result.bars.isEmpty() && current?.bars?.isNotEmpty() == true) {
+            throw IllegalStateException("Empty history response")
+        }
+        return result
     }
 
     fun onPeriodChange(newPeriod: String) {

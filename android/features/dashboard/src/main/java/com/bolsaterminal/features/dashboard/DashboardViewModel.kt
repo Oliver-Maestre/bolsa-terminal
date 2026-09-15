@@ -27,6 +27,7 @@ class DashboardViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<UiState<DashboardUiModel>>(UiState.Idle)
     val state: StateFlow<UiState<DashboardUiModel>> = _state.asStateFlow()
+    private var consecutiveRefreshFailures = 0
 
     init {
         load()
@@ -36,13 +37,48 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = UiState.Loading
             try {
-                val indices = getMarketOverview()
-                val screener = getScreener()
-                val topMovers = screener.sortedByDescending { kotlin.math.abs(it.changePercent) }.take(10)
-                _state.value = UiState.Loaded(DashboardUiModel(indices, topMovers))
+                _state.value = UiState.Loaded(fetch())
             } catch (e: Exception) {
                 _state.value = UiState.Error(e.message.orEmpty())
             }
         }
+    }
+
+    /**
+     * Periodic silent refresh — keeps showing the last good data on
+     * failure, no loading spinner. After 3 consecutive failures falls back
+     * to a full [load] so a sustained outage surfaces as an actionable
+     * error instead of staying stuck on stale/empty data forever.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                _state.value = UiState.Loaded(fetch())
+                consecutiveRefreshFailures = 0
+            } catch (_: Exception) {
+                consecutiveRefreshFailures++
+                if (consecutiveRefreshFailures >= 3) {
+                    consecutiveRefreshFailures = 0
+                    load()
+                }
+            }
+        }
+    }
+
+    private suspend fun fetch(): DashboardUiModel {
+        val indices = getMarketOverview()
+        val screener = getScreener()
+        val topMovers = screener.sortedByDescending { kotlin.math.abs(it.changePercent) }.take(10)
+
+        // A backend hiccup can return a valid-but-empty list rather than
+        // actually failing — don't let that silently wipe good data on screen.
+        val current = (_state.value as? UiState.Loaded<DashboardUiModel>)?.data
+        if (indices.isEmpty() && current?.indices?.isNotEmpty() == true) {
+            throw IllegalStateException("Empty market overview response")
+        }
+        if (topMovers.isEmpty() && current?.topMovers?.isNotEmpty() == true) {
+            throw IllegalStateException("Empty screener response")
+        }
+        return DashboardUiModel(indices, topMovers)
     }
 }

@@ -36,6 +36,7 @@ class BrokerViewModel @Inject constructor(
         private set
     var showValidationError by mutableStateOf(false)
         private set
+    private var consecutiveRefreshFailures = 0
 
     init {
         load()
@@ -48,6 +49,27 @@ class BrokerViewModel @Inject constructor(
                 _state.value = UiState.Loaded(repository.getAccount())
             } catch (e: Exception) {
                 _state.value = UiState.Error(e.message.orEmpty())
+            }
+        }
+    }
+
+    /**
+     * Periodic silent refresh — keeps showing the last good account state
+     * on failure. After 3 consecutive failures falls back to a full [load]
+     * so a sustained outage surfaces as an actionable error instead of
+     * staying stuck on stale data forever.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                _state.value = UiState.Loaded(repository.getAccount())
+                consecutiveRefreshFailures = 0
+            } catch (_: Exception) {
+                consecutiveRefreshFailures++
+                if (consecutiveRefreshFailures >= 3) {
+                    consecutiveRefreshFailures = 0
+                    load()
+                }
             }
         }
     }

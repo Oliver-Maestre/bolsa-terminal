@@ -41,6 +41,11 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
+    /** Periodic silent refresh of quotes for the currently held positions. */
+    fun refresh() {
+        viewModelScope.launch { refreshQuotes(positions.value) }
+    }
+
     private suspend fun refreshQuotes(positions: List<PortfolioPosition>) {
         val symbols = positions.map { it.symbol }.distinct()
         if (symbols.isEmpty()) {
@@ -48,7 +53,12 @@ class PortfolioViewModel @Inject constructor(
             return
         }
         try {
-            _quotes.value = marketRepository.getBatchQuotes(symbols).associateBy { it.symbol }
+            val result = marketRepository.getBatchQuotes(symbols).associateBy { it.symbol }
+            // A backend hiccup can return a valid-but-empty list rather than
+            // actually failing — don't let that silently wipe good quotes.
+            if (result.isNotEmpty() || _quotes.value.isEmpty()) {
+                _quotes.value = result
+            }
         } catch (_: Exception) {
             // Keep last known quotes — a transient failure shouldn't blank the screen.
         }

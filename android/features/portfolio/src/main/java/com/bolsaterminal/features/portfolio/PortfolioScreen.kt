@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.bolsaterminal.core.designsystem.BtColors
 import com.bolsaterminal.core.designsystem.components.MetricTile
 import com.bolsaterminal.core.model.PortfolioPosition
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun PortfolioScreen(viewModel: PortfolioViewModel = hiltViewModel()) {
@@ -47,6 +53,16 @@ fun PortfolioScreen(viewModel: PortfolioViewModel = hiltViewModel()) {
     val quotes by viewModel.quotes.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var editingPosition by remember { mutableStateOf<PortfolioPosition?>(null) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (isActive) {
+                delay(60_000)
+                viewModel.refresh()
+            }
+        }
+    }
 
     Scaffold(
         containerColor = BtColors.background,

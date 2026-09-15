@@ -22,12 +22,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.bolsaterminal.core.common.UiState
 import com.bolsaterminal.core.designsystem.BtColors
 import com.bolsaterminal.core.designsystem.components.CandlestickChart
@@ -37,6 +41,8 @@ import com.bolsaterminal.core.designsystem.components.LoadingIndicator
 import com.bolsaterminal.core.designsystem.components.RecommendationCard
 import com.bolsaterminal.core.designsystem.components.VolumeChart
 import com.bolsaterminal.core.model.HistoryResponse
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun ChartScreen(viewModel: ChartViewModel = hiltViewModel()) {
@@ -45,6 +51,16 @@ fun ChartScreen(viewModel: ChartViewModel = hiltViewModel()) {
     val period by viewModel.period.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (isActive) {
+                delay(60_000)
+                viewModel.refresh()
+            }
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize().background(BtColors.background)) {
         Column(modifier = Modifier.padding(12.dp)) {

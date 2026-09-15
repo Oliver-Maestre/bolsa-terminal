@@ -21,6 +21,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,18 +29,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.bolsaterminal.core.common.UiState
 import com.bolsaterminal.core.designsystem.BtColors
 import com.bolsaterminal.core.designsystem.components.ErrorBanner
 import com.bolsaterminal.core.designsystem.components.LoadingIndicator
 import com.bolsaterminal.core.model.OHLCVBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun ComparisonScreen(viewModel: ComparisonViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val symbolsInput by viewModel.symbolsInput.collectAsStateWithLifecycle()
     val period by viewModel.period.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (isActive) {
+                delay(60_000)
+                viewModel.refresh()
+            }
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize().background(BtColors.background)) {
         Column(modifier = Modifier.padding(12.dp)) {

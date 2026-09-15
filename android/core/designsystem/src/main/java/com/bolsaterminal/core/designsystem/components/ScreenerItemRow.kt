@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bolsaterminal.core.designsystem.BtColors
@@ -25,9 +26,12 @@ fun ScreenerItemRow(item: ScreenerItem, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column {
-            Text(item.symbol, color = BtColors.textPrimary, fontFamily = BtMonoFontFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Text(item.shortName, color = BtColors.textSecondary, fontSize = 11.sp, maxLines = 1)
+        // weight(1f) claims the space left over after the trailing (fixed-size)
+        // Row is measured, so a long company name shrinks and ellipsizes
+        // instead of overflowing into — and overlapping — the price/signal.
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+            Text(item.symbol, color = BtColors.textPrimary, fontFamily = BtMonoFontFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(item.shortName, color = BtColors.textSecondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
