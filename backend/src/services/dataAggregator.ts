@@ -1,21 +1,25 @@
 /**
  * Multi-source data aggregator
  *
- * Quote priority:  Yahoo → CoinGecko (crypto) → Stooq → FMP → AlphaVantage → Mock
- * History priority: Yahoo → Stooq → CoinGecko (crypto) → FMP → AlphaVantage → Mock
+ * Quote priority:  Yahoo → CoinGecko (crypto) → Eulerpool → Stooq → FMP → AlphaVantage → Mock
+ * History priority: Yahoo → Eulerpool → Stooq → CoinGecko (crypto) → FMP → AlphaVantage → Mock
  *
- * Stooq requires no API key and covers US + European stocks + indices + forex.
+ * Stooq requires no API key but its legacy CSV scraping endpoints have been
+ * discontinued (returns 404 / anti-bot challenge as of 2026) — kept last in
+ * case it recovers, but Eulerpool is the real no-mock fallback for stocks now.
+ * Eulerpool requires EULERPOOL_API_KEY (free: 100k req/month, no card).
  * FMP requires FMP_API_KEY (free: 250 req/day at financialmodelingprep.com).
  */
 
-import { getQuote as yfQuote, getHistory as yfHistory }   from './yahooFinance';
-import { getCGQuote, getCGHistory, isCryptoSymbol }        from './coinGecko';
-import { getAVQuote, getAVHistory, isAvAvailable }         from './alphaVantage';
-import { getStooqQuote, getStooqHistory }                  from './stooq';
-import { getFmpQuote, getFmpHistory, isFmpAvailable }      from './fmp';
-import { getMockQuote, getMockHistory }                    from './mockData';
-import { OHLCVBar, QuoteSummary }                          from '../types/index';
-import * as cache                                          from './cache';
+import { getQuote as yfQuote, getHistory as yfHistory }         from './yahooFinance';
+import { getCGQuote, getCGHistory, isCryptoSymbol }              from './coinGecko';
+import { getAVQuote, getAVHistory, isAvAvailable }               from './alphaVantage';
+import { getStooqQuote, getStooqHistory }                        from './stooq';
+import { getFmpQuote, getFmpHistory, isFmpAvailable }            from './fmp';
+import { getEulerpoolQuote, getEulerpoolHistory, isEulerpoolAvailable } from './eulerpool';
+import { getMockQuote, getMockHistory }                          from './mockData';
+import { OHLCVBar, QuoteSummary }                                from '../types/index';
+import * as cache                                                from './cache';
 
 // ── QUOTE ─────────────────────────────────────────────────────────────────────
 export async function getQuoteAggregated(
@@ -52,7 +56,13 @@ export async function getQuoteAggregated(
     if (cg) return cg;
   }
 
-  // 2b. Stooq (no API key — works for stocks, indices, forex)
+  // 2b. Eulerpool (free key, 100k req/month — the real stock fallback now)
+  if (isEulerpoolAvailable()) {
+    const ep = await trySource(() => getEulerpoolQuote(sym), 'eulerpool', 20);
+    if (ep) return ep;
+  }
+
+  // 2c. Stooq (no API key — kept in case its scraping endpoints recover)
   const stooq = await trySource(() => getStooqQuote(sym), 'stooq', 20);
   if (stooq) return stooq;
 
@@ -113,25 +123,31 @@ export async function getHistoryAggregated(
   );
   if (yahoo) return yahoo;
 
-  // 2. Stooq (no API key, good coverage for daily bars)
+  // 2. Eulerpool (free key, 100k req/month — the real stock fallback now)
+  if (isEulerpoolAvailable()) {
+    const ep = await tryHistory(() => getEulerpoolHistory(sym, period), 'eulerpool');
+    if (ep) return ep;
+  }
+
+  // 3. Stooq (no API key — kept in case its scraping endpoints recover)
   const stooq = await tryHistory(() => getStooqHistory(sym, period), 'stooq');
   if (stooq) return stooq;
 
-  // 3a. CoinGecko for crypto
+  // 4a. CoinGecko for crypto
   if (isCryptoSymbol(sym)) {
     const cg = await tryHistory(() => getCGHistory(sym, period), 'coingecko');
     if (cg) return cg;
   }
 
-  // 3b. Financial Modeling Prep
+  // 4b. Financial Modeling Prep
   if (isFmpAvailable()) {
     const fmp = await tryHistory(() => getFmpHistory(sym, period), 'fmp');
     if (fmp) return fmp;
   }
 
-  // 4. Alpha Vantage
+  // 5. Alpha Vantage
   if (!isCryptoSymbol(sym) && isAvAvailable()) {
-    const allBars = await getFmpHistory(sym, '10y').catch(() => [] as OHLCVBar[]);
+    const allBars = await getAVHistory(sym).catch(() => [] as OHLCVBar[]);
     if (allBars.length > MIN_BARS) {
       const bars   = filterByPeriod(allBars, period);
       const result = { bars, source: 'alphavantage' };
@@ -140,7 +156,7 @@ export async function getHistoryAggregated(
     }
   }
 
-  // 5. Mock fallback
+  // 6. Mock fallback
   const mockBars = getMockHistory(sym, period);
   return { bars: mockBars, source: 'mock' };
 }

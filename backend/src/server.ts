@@ -131,7 +131,13 @@ async function refreshScreener() {
   }
 
   if (items.length > 0) {
-    cache.set('screener:all', items, 10 * 60);
+    // TTL must comfortably outlive the 15-minute refresh interval below —
+    // a shorter TTL (this used to be 10 min) creates a recurring window
+    // where the cache expires before the next refresh runs, making
+    // /api/screener genuinely return [] to every client until the next
+    // refresh completes (this was the real cause of periodic-refresh
+    // clients on web/macOS/Android intermittently going blank).
+    cache.set('screener:all', items, 20 * 60);
     console.log(`[Screener] Refresh complete. ${items.length}/${ALL_TICKERS.length} symbols updated.`);
   } else {
     console.log('[Screener] Refresh returned 0 items — keeping existing cache (mock or previous real data).');

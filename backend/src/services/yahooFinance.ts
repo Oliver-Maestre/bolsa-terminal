@@ -6,8 +6,11 @@ import { OHLCVBar, QuoteSummary, SearchResult } from '../types/index';
 // Suppress yahoo-finance2 validation errors for missing fields
 try { yahooFinance.setGlobalConfig?.({ validation: { logErrors: false } }); } catch (_) { /* ignore */ }
 
-// Retry wrapper for rate-limited requests
-async function withRetry<T>(fn: () => Promise<T>, retries = 3, baseDelay = 2000): Promise<T> {
+// Retry wrapper for rate-limited requests. Yahoo's rate limit is IP-level and
+// sustained across many consecutive requests in practice — retrying within a
+// single call rarely helps and just delays falling through to the next
+// provider in the aggregator chain, so this defaults to a single attempt.
+async function withRetry<T>(fn: () => Promise<T>, retries = 1, baseDelay = 2000): Promise<T> {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       return await fn();

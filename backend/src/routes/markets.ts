@@ -44,7 +44,12 @@ router.get('/overview', async (_req: Request, res: Response) => {
     .filter((r): r is PromiseFulfilledResult<MarketIndex> => r.status === 'fulfilled')
     .map(r => r.value);
 
-  cache.set(cacheKey, data, 60); // 1 min TTL
+  // Never cache an empty result — a transient hiccup would otherwise get
+  // served to every polling client for a full minute (same bug class as the
+  // screener refresh, see server.ts).
+  if (data.length > 0) {
+    cache.set(cacheKey, data, 60); // 1 min TTL
+  }
   res.json(data);
 });
 
