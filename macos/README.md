@@ -50,3 +50,21 @@ BolsaTerminal/
 
 - `NSAllowsLocalNetworking: true` en `Info.plist` permite conectar a `localhost` en desarrollo (App Transport Security de macOS bloquea HTTP en claro por defecto).
 - Los campos de indicadores técnicos (RSI/MACD/EMA en periodos cortos) son opcionales (`Double?`) porque el backend serializa `NaN` como `null` en JSON durante el warmup del indicador.
+- Cada pantalla de datos (Dashboard, Screener, Chart, Comparison, Portfolio, Broker) se refresca sola cada 60s mientras está en pantalla, sin parpadeo de spinner (un método `refresh()` silencioso junto al `load()` inicial) — se detiene solo al salir de la vista. Bot/AI usan SSE en vivo, no polling; Simulator es un formulario de un solo uso.
+
+## Icono y distribución
+
+- El icono (`BolsaTerminal/Assets.xcassets/AppIcon.appiconset`) usa la paleta del design system (fondo `btBackground`/`btSecondary`, velas verde/rojo, línea de tendencia en `btAccent`). Generado con Pillow — script de referencia en el historial de esta sesión, no versionado (es un asset estático, no build step).
+- **Generar el instalador DMG** (`.app` sin firmar — ad-hoc, `CODE_SIGN_IDENTITY: "-"` — no hay cuenta de Apple Developer; al abrirlo por primera vez macOS pedirá "clic derecho → Abrir" o Ajustes → Privacidad y seguridad → "Abrir de todos modos"):
+  ```bash
+  cd macos
+  xcodegen generate
+  xcodebuild -project BolsaTerminal.xcodeproj -scheme BolsaTerminal -configuration Release -derivedDataPath ./DerivedDataRelease build
+
+  STAGING=$(mktemp -d)
+  cp -R "DerivedDataRelease/Build/Products/Release/Bolsa Terminal.app" "$STAGING/"
+  ln -s /Applications "$STAGING/Applications"
+  mkdir -p dist
+  hdiutil create -volname "Bolsa Terminal" -srcfolder "$STAGING" -ov -format UDZO dist/BolsaTerminal-Installer.dmg
+  ```
+  Resultado en `macos/dist/BolsaTerminal-Installer.dmg` (no versionado, se regenera bajo demanda). Instalación: abrir el DMG, arrastrar **Bolsa Terminal** a **Applications**.
